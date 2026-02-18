@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="scene-container" style="width: 100%; height: 600px" />
+  <div ref="container" class="fit" style="width: 100%; height: 100%; overflow: hidden" />
 </template>
 
 <script setup>
@@ -10,34 +10,59 @@ import { parts } from 'src/composables/data'
 
 const container = ref(null)
 let scene, camera, renderer, controls, animationId
+let fontLoaded = false
 
-function createTextLabel(text, fontSize, color, fontWeight = 'bold', fontFace = 'Arial') {
+// Carrega fontes do Google Fonts
+function loadFonts() {
+  if (fontLoaded) return
+  const link = document.createElement('link')
+  link.href =
+    'https://fonts.googleapis.com/css2?family=Arial&family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Poppins:wght@400;700&family=Montserrat:wght@400;700&family=Playfair+Display:wght@400;700&family=Lato:wght@400;700&family=Ubuntu:wght@400;700&display=swap'
+  link.rel = 'stylesheet'
+  document.head.appendChild(link)
+  fontLoaded = true
+}
+
+function createTextLabel(
+  text,
+  fontSize,
+  color,
+  fontWeight = 'bold',
+  fontFace = 'Arial',
+  letterSpacing = 0,
+) {
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d')
 
   const lines = text.split('\n')
-  const lineHeight = fontSize * 1.1 // Reduzi um pouco o espaçamento para aproximar da base
-  context.font = `${fontWeight} ${fontSize}px ${fontFace}`
+  const lineHeight = fontSize * 1.1
+  context.font = `${fontWeight} ${fontSize}px "${fontFace}"`
 
   let maxLineWidth = 0
   lines.forEach((line) => {
-    const width = context.measureText(line).width
+    const width = context.measureText(line).width + line.length * letterSpacing
     if (width > maxLineWidth) maxLineWidth = width
   })
 
-  // Canvas ajustado sem folgas extras no topo/base
   canvas.width = maxLineWidth + 10
   canvas.height = lineHeight * lines.length
 
-  context.font = `${fontWeight} ${fontSize}px ${fontFace}`
+  context.font = `${fontWeight} ${fontSize}px "${fontFace}"`
   context.fillStyle = color
   context.textAlign = 'center'
-  context.textBaseline = 'bottom' // Texto alinha pela base do canvas
+  context.textBaseline = 'bottom'
 
   lines.forEach((line, index) => {
-    // Inverte a ordem para a última linha ficar na base do canvas
     const yPos = canvas.height - (lines.length - 1 - index) * lineHeight
-    context.fillText(line, canvas.width / 2, yPos)
+    if (letterSpacing > 0) {
+      let xOffset = -maxLineWidth / 2
+      for (let i = 0; i < line.length; i++) {
+        context.fillText(line[i], canvas.width / 2 + xOffset, yPos)
+        xOffset += context.measureText(line[i]).width + letterSpacing
+      }
+    } else {
+      context.fillText(line, canvas.width / 2, yPos)
+    }
   })
 
   const texture = new THREE.CanvasTexture(canvas)
@@ -48,8 +73,24 @@ function createTextLabel(text, fontSize, color, fontWeight = 'bold', fontFace = 
   const pWidth = pHeight * ratio
 
   const geometry = new THREE.PlaneGeometry(pWidth, pHeight)
-  // AJUSTE CRUCIAL: Move a geometria para que o (0,0,0) seja a borda inferior
   geometry.translate(0, pHeight / 2, 0)
+
+  const material = new THREE.MeshStandardMaterial({
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide,
+    roughness: 0.5,
+  })
+
+  return new THREE.Mesh(geometry, material)
+}
+
+function createImageLabel(imageBase64, width, height) {
+  const texture = new THREE.TextureLoader().load(imageBase64)
+  texture.anisotropy = 16
+
+  const geometry = new THREE.PlaneGeometry(width, height)
+  geometry.translate(0, height / 2, 0)
 
   const material = new THREE.MeshStandardMaterial({
     map: texture,
@@ -63,25 +104,36 @@ function createTextLabel(text, fontSize, color, fontWeight = 'bold', fontFace = 
 
 function initScene() {
   if (!container.value) return
+  
   scene = new THREE.Scene()
   scene.background = new THREE.Color(0xffffff)
 
-  const width = container.value.clientWidth
-  const height = container.value.clientHeight
+  const width = container.value.clientWidth || window.innerWidth
+  const height = container.value.clientHeight || window.innerHeight
+  
+  if (width === 0 || height === 0) {
+    console.warn('Container has no dimensions yet')
+    setTimeout(initScene, 100)
+    return
+  }
+  
   camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 1000)
   camera.position.set(5, 3, 8)
 
-  renderer = new THREE.WebGLRenderer({ antialias: true })
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
   renderer.setSize(width, height)
   renderer.setPixelRatio(window.devicePixelRatio)
+  renderer.setClearColor(0xffffff)
   container.value.appendChild(renderer.domElement)
 
   controls = new OrbitControls(camera, renderer.domElement)
   controls.enableDamping = true
+  controls.autoRotate = false
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.9))
   const light = new THREE.DirectionalLight(0xffffff, 0.8)
   light.position.set(5, 10, 5)
+  light.castShadow = true
   scene.add(light)
 
   createModel()
@@ -109,29 +161,41 @@ function createModel() {
 
   // 2. TÍTULO (Colado na base)
   const t = parts.title
-  const titleMesh = createTextLabel(t.text, 120, t.color, 'bold', t.content.font)
-
-  // Como transladamos a geometria, a posição Y é EXATAMENTE o topo da base
+  const titleMesh = createTextLabel(
+    t.text,
+    120,
+    t.color,
+    'bold',
+    t.content.font,
+    t.content.letterSpacing || 0,
+  )
   titleMesh.position.set(0.5, baseHeight, 0)
   group.add(titleMesh)
 
   // 3. SUBTÍTULO (Na face frontal)
   const s = parts.base.content
-  const subtitleMesh = createTextLabel(s.text, 70, s.color, 'normal', s.font)
-  subtitleMesh.position.set(0, 0, 0.51) // Relativo ao centro do grupo, ajustaremos abaixo
+  const subtitleMesh = createTextLabel(s.text, 70, s.color, 'normal', s.font, s.letterSpacing || 0)
+  subtitleMesh.position.set(0, 0, 0.51)
   group.add(subtitleMesh)
-  // Ajuste para o subtítulo ficar no centro da altura da base
   subtitleMesh.translateY(baseHeight / 2 - subtitleMesh.geometry.parameters.height / 2)
 
-  // 4. ÍCONE (Box 100% Transparente)
+  // 4. LOGO (Imagem ou Box)
   const l = parts.logo
-  const logoMesh = new THREE.Mesh(
-    new THREE.BoxGeometry(l.width, l.height, 0.2),
-    new THREE.MeshStandardMaterial({
-      transparent: true,
-      opacity: 0.5,
-    }),
-  )
+  let logoMesh
+
+  if (l.imageBase64) {
+    logoMesh = createImageLabel(l.imageBase64, l.width, l.height)
+  } else {
+    logoMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(l.width, l.height, 0.2),
+      new THREE.MeshStandardMaterial({
+        color: l.color,
+        transparent: true,
+        opacity: 0.3,
+      }),
+    )
+  }
+
   logoMesh.position.set(-1.4, baseHeight + l.height / 2, 0)
   group.add(logoMesh)
 
@@ -144,12 +208,24 @@ function animate() {
   renderer.render(scene, camera)
 }
 
+function onWindowResize() {
+  if (!container.value || !camera || !renderer) return
+  const width = container.value.clientWidth
+  const height = container.value.clientHeight
+  camera.aspect = width / height
+  camera.updateProjectionMatrix()
+  renderer.setSize(width, height)
+}
+
 onMounted(async () => {
   await nextTick()
+  loadFonts()
   initScene()
+  window.addEventListener('resize', onWindowResize)
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', onWindowResize)
   cancelAnimationFrame(animationId)
   renderer.dispose()
 })

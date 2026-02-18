@@ -20,7 +20,7 @@ export const parts = reactive({
     weight: 80,
     height: 0.4,
     content: {
-      font: 'Arial',
+      font: 'Roboto',
       align: 'center',
       lineHeight: 1.2,
       letterSpacing: 1.0,
@@ -28,6 +28,7 @@ export const parts = reactive({
   },
   logo: {
     svg: '',
+    imageBase64: '',
     width: 1.0,
     height: 1.0,
     size: 0.05,
@@ -37,8 +38,8 @@ export const parts = reactive({
 
 export const sceneConfig = {
   camera: {
-    position: { x: 5, y: 3, z: 8 }, // Mais próximo para ver detalhes
-    target: { x: 0, y: 0.3, z: 0 }, // Alvo mais baixo
+    position: { x: 5, y: 3, z: 8 },
+    target: { x: 0, y: 0.3, z: 0 },
   },
   lighting: {
     ambient: 0x404060,
@@ -46,7 +47,7 @@ export const sceneConfig = {
     backLight: { intensity: 0.5, position: { x: -3, y: 4, z: -3 } },
   },
   shadows: true,
-  grid: true, // Ligar grid para referência
+  grid: true,
   axes: false,
 }
 
