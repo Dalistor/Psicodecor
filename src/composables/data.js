@@ -8,12 +8,20 @@ export const parts = reactive({
     content: {
       text: 'Teste',
       font: 'Arial',
+      fontSize: 70,
       align: 'center',
       lineHeight: 100,
       letterSpacing: 0.5,
+      depth: 0.05,
       color: '#ffd500',
       positionX: 0,
+      positionY: 0,
     },
+  },
+  topPlate: {
+    color: '#1a1a1a',
+    height: 0.06,
+    style: 'bevel',
   },
   title: {
     color: '#ffc504',
@@ -21,11 +29,14 @@ export const parts = reactive({
     weight: 80,
     height: 0.4,
     positionX: 0,
+    positionY: 0,
     content: {
       font: 'Roboto',
+      fontSize: 120,
       align: 'center',
       lineHeight: 1.2,
       letterSpacing: 1.0,
+      depth: 0.05,
     },
   },
   logo: {
@@ -36,6 +47,16 @@ export const parts = reactive({
     size: 0.05,
     color: '#ffffff',
     positionX: -1.4,
+    positionY: 0,
+    depth: 0.05,
+    // Edição de imagem
+    removeBg: false,
+    bgThreshold: 30,
+    brightness: 0,
+    contrast: 0,
+    hueShift: 0,
+    saturate: 0,
+    invert: false,
   },
 })
 

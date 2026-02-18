@@ -12,6 +12,13 @@ body,
   height: 100%;
   overflow: hidden;
 }
+
+/* Garante que todos os containers do Quasar tenham 100% de altura */
+.q-layout,
+.q-page-container,
+.q-page {
+  height: 100% !important;
+}
 </style>
 
 <script setup>

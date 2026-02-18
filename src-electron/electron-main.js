@@ -19,6 +19,7 @@ async function createWindow() {
     width: 1000,
     height: 600,
     useContentSize: true,
+    fullscreen: true,
     webPreferences: {
       contextIsolation: true,
       // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
@@ -31,9 +32,6 @@ async function createWindow() {
       ),
     },
   })
-
-  // Maximizar a janela
-  mainWindow.maximize()
 
   // Remover menu bar em produção
   if (!process.env.DEV) {

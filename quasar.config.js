@@ -165,7 +165,9 @@ export default defineConfig((/* ctx */) => {
       // extendElectronMainConf (esbuildConf) {},
       // extendElectronPreloadConf (esbuildConf) {},
 
-      // extendPackageJson (json) {},
+      extendPackageJson(json) {
+        json.main = './electron-main.js'
+      },
 
       // Electron preload scripts (if any) from /src-electron, WITHOUT file extension
       preloadScripts: ['electron-preload'],
@@ -192,37 +194,10 @@ export default defineConfig((/* ctx */) => {
       },
 
       builder: {
-        // https://www.electron.build/configuration
-        appId: 'psicodecor',
-        productName: 'Psicodecor Editor',
-        directories: {
-          buildResources: 'src-electron/icons',
-        },
-        win: {
-          target: [
-            {
-              target: 'nsis',
-              arch: ['x64', 'ia32'],
-            },
-            {
-              target: 'portable',
-              arch: ['x64'],
-            },
-          ],
-        },
-        nsis: {
-          oneClick: false,
-          allowToChangeInstallationDirectory: true,
-          createDesktopShortcut: true,
-          createStartMenuShortcut: true,
-        },
-        mac: {
-          target: ['dmg', 'zip'],
-          category: 'public.app-category.graphics-design',
-        },
+        appId: 'com.psicodecor.editor',
+
         linux: {
-          target: ['AppImage', 'deb'],
-          category: 'Graphics',
+          target: ['AppImage'],
         },
       },
     },
