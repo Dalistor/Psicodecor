@@ -50,7 +50,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: releases-macos
-          path: dist/electron/Packaged/*.dmg
+          path: |
+            dist/electron/Packaged/*.dmg
+            dist/electron/Packaged/*.zip
 
       - name: Upload artifacts (Linux)
         if: runner.os == 'Linux'
