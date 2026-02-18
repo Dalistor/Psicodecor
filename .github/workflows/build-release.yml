@@ -40,24 +40,28 @@ jobs:
 
       - name: Upload artifacts (Windows)
         if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: releases-windows
-          path: dist/electron/**/*.{exe,msi}
+          path: dist/electron/Packaged/*.exe
 
       - name: Upload artifacts (macOS)
         if: runner.os == 'macOS'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: releases-macos
-          path: dist/electron/**/*.{dmg,zip}
+          path: |
+            dist/electron/Packaged/*.dmg
+            dist/electron/Packaged/*.zip
 
       - name: Upload artifacts (Linux)
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: releases-linux
-          path: dist/electron/**/*.{AppImage,deb}
+          path: |
+            dist/electron/Packaged/*.AppImage
+            dist/electron/Packaged/*.deb
 
   create-release:
     needs: build
@@ -68,7 +72,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ./releases
 
