@@ -184,6 +184,11 @@ export default defineConfig((/* ctx */) => {
         // win32metadata: { ... }
       },
 
+      extendElectronPreloadConf (cfg) {
+        cfg.external = cfg.external || []
+        cfg.external = ['electron-store']
+      },
+
       builder: {
         // https://www.electron.build/configuration
 
