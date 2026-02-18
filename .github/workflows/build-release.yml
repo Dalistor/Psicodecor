@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: releases-windows
-          path: dist/electron/Packaged/*.exe
+          path: dist/electron/**/*.{exe,msi}
 
       - name: Upload artifacts (macOS)
         if: runner.os == 'macOS'
@@ -51,8 +51,7 @@ jobs:
         with:
           name: releases-macos
           path: |
-            dist/electron/Packaged/*.dmg
-            dist/electron/Packaged/*.zip
+            dist/electron/**/*.{dmg,zip}
 
       - name: Upload artifacts (Linux)
         if: runner.os == 'Linux'
@@ -60,8 +59,7 @@ jobs:
         with:
           name: releases-linux
           path: |
-            dist/electron/Packaged/*.AppImage
-            dist/electron/Packaged/*.deb
+            dist/electron/**/*.{AppImage,deb}
 
   create-release:
     needs: build
