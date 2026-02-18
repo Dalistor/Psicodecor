@@ -57,12 +57,14 @@ sudo apt install wine64 wine32
 ## ✨ Funcionalidades
 
 ### Editor 3D
+
 - 🎨 **Renderização em tempo real** com Three.js
 - 🔄 **OrbitControls** para navegação intuitiva
 - 📐 **Detecção automática de resolução** e redimensionamento responsivo
 - 🌓 **Tema escuro** otimizado para longas sessões de trabalho
 
 ### Customização de Texto
+
 - ✍️ **Título e Subtítulo** independentes com controles separados
 - 🔤 **25+ fontes estilosas** do Google Fonts (Cinzel, Abril Fatface, Pacifico, Orbitron, etc.)
 - 📏 **Tamanho de fonte** ajustável (14-240px)
@@ -72,11 +74,13 @@ sudo apt install wine64 wine32
 - 🎭 **Profundidade 3D** ajustável (0-0.3) com 80 camadas para efeito volumétrico
 
 ### Editor de Imagem PNG
+
 Ferramentas de edição integradas para logos:
+
 - 🧹 **Remover fundo** automático (cores claras/brancas)
 - 🎚️ **Sensibilidade de remoção** ajustável (0-255)
 - ☀️ **Ajuste de brilho** (-100 a +100)
-- 🔲 **Ajuste de contraste** (-100 a +100)  
+- 🔲 **Ajuste de contraste** (-100 a +100)
 - 🎨 **Ajuste de saturação** (-100 a +100)
 - 🌈 **Rotação de matiz** (0-360°) para alterar cores
 - 🔄 **Inverter cores** (efeito negativo)
@@ -87,11 +91,13 @@ Ferramentas de edição integradas para logos:
 ### Elementos da Placa
 
 #### Base
+
 - 🎨 **Cor personalizável**
 - 📏 **Altura ajustável** (0.5 padrão)
 - 📝 **Texto frontal** (Subtítulo) com controles completos
 
 #### Top Plate (Chapa Superior)
+
 - 🎨 **Cor independente**
 - 📏 **Altura configurável**
 - 🔷 **6 estilos de aresta**:
@@ -103,6 +109,7 @@ Ferramentas de edição integradas para logos:
   - Top-inset (curvada para dentro)
 
 ### Interface
+
 - 📦 **Menu lateral redimensionável** (200-600px)
 - 📋 **Seções expansíveis** organizadas por categoria
 - 🎛️ **Sliders interativos** com feedback visual em tempo real
@@ -121,6 +128,7 @@ Ferramentas de edição integradas para logos:
 ## 🎯 Caso de Uso
 
 Ideal para criação de placas personalizadas para:
+
 - 🏢 Placas de identificação profissional
 - 🎁 Presentes personalizados
 - 🏠 Decoração residencial
@@ -139,6 +147,7 @@ Para gerar instaladores automaticamente para todas as plataformas:
 5. Insira a versão (ex: `v1.0.0`)
 
 O workflow irá:
+
 - ✅ Build em paralelo para Windows, macOS e Linux
 - ✅ Gerar instaladores nativos para cada plataforma
 - ✅ Criar uma release no GitHub com todos os arquivos anexados
@@ -146,6 +155,7 @@ O workflow irá:
 ## ⚙️ Configuração Electron
 
 A aplicação está configurada para:
+
 - ✅ Iniciar maximizada (permite uso da barra do SO)
 - ✅ Barra de menu removida em produção
 - ✅ Instaladores nativos para cada plataforma
@@ -187,6 +197,7 @@ psicodecor/
 ## 📝 Customização
 
 Para customizar o projeto, consulte:
+
 - [Quasar Config](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js)
 - [Three.js Docs](https://threejs.org/docs/)
 - [Electron Builder](https://www.electron.build/configuration/configuration)
@@ -194,12 +205,15 @@ Para customizar o projeto, consulte:
 ## 🐛 Troubleshooting
 
 ### Build falha no Linux
+
 Certifique-se de ter o `wine` instalado para builds Windows.
 
 ### Imagem não aparece
+
 Verifique se o formato é PNG/JPG/WEBP e tente ajustar a sensibilidade de remoção de fundo.
 
 ### Performance lenta
+
 - Reduza a profundidade 3D dos elementos
 - Diminua o tamanho da fonte
 - Use imagens menores (< 1MB)

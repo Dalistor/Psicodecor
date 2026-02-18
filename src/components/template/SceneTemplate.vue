@@ -375,7 +375,7 @@ function initScene() {
 
 async function createModel() {
   if (!scene) return
-  
+
   // Remove e limpa o grupo anterior corretamente
   const oldGroup = scene.getObjectByName('mainGroup')
   if (oldGroup) {
@@ -550,7 +550,7 @@ async function createModel() {
   group.add(logoMesh)
 
   scene.add(group)
-  
+
   // Força uma renderização limpa após adicionar os novos objetos
   if (renderer) {
     renderer.clear()
@@ -666,7 +666,7 @@ onBeforeUnmount(() => {
   if (renderer && renderer.domElement && renderer.domElement.parentNode) {
     renderer.domElement.parentNode.removeChild(renderer.domElement)
   }
-  
+
   // Limpa todas as texturas e materiais da cena
   if (scene) {
     scene.traverse((obj) => {
@@ -686,7 +686,7 @@ onBeforeUnmount(() => {
       }
     })
   }
-  
+
   if (renderer) {
     renderer.dispose()
   }
