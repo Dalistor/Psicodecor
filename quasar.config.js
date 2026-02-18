@@ -195,7 +195,6 @@ export default defineConfig((/* ctx */) => {
         // https://www.electron.build/configuration
         appId: 'psicodecor',
         productName: 'Psicodecor Editor',
-        files: ['dist/electron/**/*'],
         directories: {
           buildResources: 'src-electron/icons',
         },
