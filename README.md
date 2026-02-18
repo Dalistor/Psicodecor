@@ -2,42 +2,75 @@
 
 Um programa de edição de uma logo padrão
 
-## Install the dependencies
+## Instalação de dependências
 
 ```bash
-yarn
-# or
 npm install
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+### Desenvolvimento com Electron (modo hot-reload)
 
 ```bash
-quasar dev
+npm run dev
 ```
 
-### Lint the files
+A aplicação abrirá em uma janela Electron maximizada.
+
+### Lint dos arquivos
 
 ```bash
-yarn lint
-# or
 npm run lint
 ```
 
-### Format the files
+### Formatação de arquivos
 
 ```bash
-yarn format
-# or
 npm run format
 ```
 
-### Build the app for production
+### Build para produção (Electron)
 
 ```bash
-quasar build
+npm run build
 ```
 
-### Customize the configuration
+Os instaladores serão gerados em `dist/electron/Packaged/` para:
 
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+- **Windows**: arquivos `.exe` e `.msi`
+- **macOS**: arquivos `.dmg` e `.zip`
+- **Linux/Ubuntu**: arquivos `.AppImage` e `.deb`
+
+### Build e Release automático com GitHub Actions
+
+Para gerar instaladores automaticamente para todas as plataformas:
+
+1. Faça push das suas mudanças para o repositório
+2. Vá para a aba **Actions** no GitHub
+3. Selecione o workflow **Build Release Installers**
+4. Clique em **Run workflow**
+5. Insira a versão do release (ex: `v1.0.0`)
+6. O workflow irá:
+   - Fazer build em Windows, macOS e Linux em paralelo
+   - Gerar os instaladores para cada plataforma
+   - Criar uma release no GitHub com todos os arquivos
+
+### Configuração Electron
+
+A aplicação está configurada para:
+
+- ✅ Iniciar maximizada (sem fullscreen, permitindo uso da barra do SO)
+- ✅ Remover a barra de menu em produção
+- ✅ Gerar instaladores nativos para cada plataforma
+
+### Recursos da aplicação
+
+- 🎨 Editor interativo 3D com Three.js
+- 📝 Edição de texto com múltiplas fontes Google Fonts
+- 🖼️ Upload de imagens PNG para logo
+- 🎯 Controle de posição horizontal e vertical
+- 🌙 Tema escuro por padrão
+- 📦 Menu lateral redimensionável
+
+### Customização
+
+Veja [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).

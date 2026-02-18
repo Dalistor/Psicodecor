@@ -193,8 +193,38 @@ export default defineConfig((/* ctx */) => {
 
       builder: {
         // https://www.electron.build/configuration
-
         appId: 'psicodecor',
+        productName: 'Psicodecor Editor',
+        files: ['dist/electron/**/*'],
+        directories: {
+          buildResources: 'src-electron/icons',
+        },
+        win: {
+          target: [
+            {
+              target: 'nsis',
+              arch: ['x64', 'ia32'],
+            },
+            {
+              target: 'portable',
+              arch: ['x64'],
+            },
+          ],
+        },
+        nsis: {
+          oneClick: false,
+          allowToChangeInstallationDirectory: true,
+          createDesktopShortcut: true,
+          createStartMenuShortcut: true,
+        },
+        mac: {
+          target: ['dmg', 'zip'],
+          category: 'public.app-category.graphics-design',
+        },
+        linux: {
+          target: ['AppImage', 'deb'],
+          category: 'Graphics',
+        },
       },
     },
 

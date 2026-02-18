@@ -1,5 +1,8 @@
 <template>
-  <div ref="container" class="fit" style="width: 100%; height: 100%; overflow: hidden" />
+  <div
+    ref="container"
+    style="width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; display: block"
+  />
 </template>
 
 <script setup>
@@ -40,28 +43,39 @@ function createTextLabel(
 
   let maxLineWidth = 0
   lines.forEach((line) => {
-    const width = context.measureText(line).width + line.length * letterSpacing
+    let width = 0
+    if (letterSpacing > 0) {
+      for (let i = 0; i < line.length; i++) {
+        width += context.measureText(line[i]).width
+        if (i < line.length - 1) width += letterSpacing
+      }
+    } else {
+      width = context.measureText(line).width
+    }
     if (width > maxLineWidth) maxLineWidth = width
   })
 
-  canvas.width = maxLineWidth + 10
+  canvas.width = maxLineWidth + 20
   canvas.height = lineHeight * lines.length
 
   context.font = `${fontWeight} ${fontSize}px "${fontFace}"`
   context.fillStyle = color
-  context.textAlign = 'center'
+  context.textAlign = 'left'
   context.textBaseline = 'bottom'
 
   lines.forEach((line, index) => {
     const yPos = canvas.height - (lines.length - 1 - index) * lineHeight
+
     if (letterSpacing > 0) {
-      let xOffset = -maxLineWidth / 2
+      let xPos = (canvas.width - maxLineWidth) / 2
       for (let i = 0; i < line.length; i++) {
-        context.fillText(line[i], canvas.width / 2 + xOffset, yPos)
-        xOffset += context.measureText(line[i]).width + letterSpacing
+        context.fillText(line[i], xPos, yPos)
+        xPos += context.measureText(line[i]).width + letterSpacing
       }
     } else {
-      context.fillText(line, canvas.width / 2, yPos)
+      const textWidth = context.measureText(line).width
+      const xPos = (canvas.width - textWidth) / 2
+      context.fillText(line, xPos, yPos)
     }
   })
 
@@ -104,19 +118,19 @@ function createImageLabel(imageBase64, width, height) {
 
 function initScene() {
   if (!container.value) return
-  
+
   scene = new THREE.Scene()
   scene.background = new THREE.Color(0xffffff)
 
   const width = container.value.clientWidth || window.innerWidth
   const height = container.value.clientHeight || window.innerHeight
-  
+
   if (width === 0 || height === 0) {
     console.warn('Container has no dimensions yet')
     setTimeout(initScene, 100)
     return
   }
-  
+
   camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 1000)
   camera.position.set(5, 3, 8)
 
@@ -169,13 +183,13 @@ function createModel() {
     t.content.font,
     t.content.letterSpacing || 0,
   )
-  titleMesh.position.set(0.5, baseHeight, 0)
+  titleMesh.position.set(t.positionX || 0, baseHeight, 0)
   group.add(titleMesh)
 
   // 3. SUBTÍTULO (Na face frontal)
   const s = parts.base.content
   const subtitleMesh = createTextLabel(s.text, 70, s.color, 'normal', s.font, s.letterSpacing || 0)
-  subtitleMesh.position.set(0, 0, 0.51)
+  subtitleMesh.position.set(s.positionX || 0, 0, 0.51)
   group.add(subtitleMesh)
   subtitleMesh.translateY(baseHeight / 2 - subtitleMesh.geometry.parameters.height / 2)
 
@@ -196,7 +210,7 @@ function createModel() {
     )
   }
 
-  logoMesh.position.set(-1.4, baseHeight + l.height / 2, 0)
+  logoMesh.position.set(l.positionX || -1.4, baseHeight + l.height / 2, 0)
   group.add(logoMesh)
 
   scene.add(group)
@@ -212,21 +226,39 @@ function onWindowResize() {
   if (!container.value || !camera || !renderer) return
   const width = container.value.clientWidth
   const height = container.value.clientHeight
-  camera.aspect = width / height
-  camera.updateProjectionMatrix()
-  renderer.setSize(width, height)
+  if (width > 0 && height > 0) {
+    camera.aspect = width / height
+    camera.updateProjectionMatrix()
+    renderer.setSize(width, height)
+  }
 }
+
+let resizeObserver = null
 
 onMounted(async () => {
   await nextTick()
   loadFonts()
   initScene()
   window.addEventListener('resize', onWindowResize)
+
+  // ResizeObserver para monitorar mudanças no tamanho do container
+  if (container.value && window.ResizeObserver) {
+    resizeObserver = new ResizeObserver(() => {
+      onWindowResize()
+    })
+    resizeObserver.observe(container.value)
+  }
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onWindowResize)
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
   cancelAnimationFrame(animationId)
+  if (renderer && renderer.domElement && renderer.domElement.parentNode) {
+    renderer.domElement.parentNode.removeChild(renderer.domElement)
+  }
   renderer.dispose()
 })
 

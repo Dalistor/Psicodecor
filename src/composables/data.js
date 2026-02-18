@@ -12,6 +12,7 @@ export const parts = reactive({
       lineHeight: 100,
       letterSpacing: 0.5,
       color: '#ffd500',
+      positionX: 0,
     },
   },
   title: {
@@ -19,6 +20,7 @@ export const parts = reactive({
     text: `Título do Projeto`,
     weight: 80,
     height: 0.4,
+    positionX: 0,
     content: {
       font: 'Roboto',
       align: 'center',
@@ -33,6 +35,7 @@ export const parts = reactive({
     height: 1.0,
     size: 0.05,
     color: '#ffffff',
+    positionX: -1.4,
   },
 })
 
