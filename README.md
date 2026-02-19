@@ -59,62 +59,56 @@ sudo apt install wine64 wine32
 ### Editor 3D
 
 - 🎨 **Renderização em tempo real** com Three.js
-- 🔄 **OrbitControls** para navegação intuitiva
-- 📐 **Detecção automática de resolução** e redimensionamento responsivo
-- 🌓 **Tema escuro** otimizado para longas sessões de trabalho
+- 🔄 **OrbitControls** para navegação
+- 📐 **Redimensionamento responsivo** (ResizeObserver + resize)
+- 🌓 **Tema escuro** por padrao
 
-### Customização de Texto
+### Customizacao de Texto
 
-- ✍️ **Título e Subtítulo** independentes com controles separados
-- 🔤 **25+ fontes estilosas** do Google Fonts (Cinzel, Abril Fatface, Pacifico, Orbitron, etc.)
-- 📏 **Tamanho de fonte** ajustável (14-240px)
-- 📊 **Espaçamento de letras** configurável (-5 a 30)
-- 📍 **Posicionamento X e Y** independente para cada elemento
-- 🆎 **Multi-linha** suportado em títulos
-- 🎭 **Profundidade 3D** ajustável (0-0.3) com 80 camadas para efeito volumétrico
+- ✍️ **Titulo e Subtitulo** com controles separados
+- 🔤 **26 fontes** do Google Fonts (Cinzel, Abril Fatface, Pacifico, Orbitron, etc.)
+- 📏 **Tamanho de fonte** ajustavel
+- 📊 **Espacamento de letras** configuravel
+- 📍 **Posicionamento X e Y** por elemento
+- 🆎 **Multilinha** no titulo
+- 🎭 **Profundidade 3D** ajustavel (camadas empilhadas)
 
-### Editor de Imagem PNG
+### Editor de Imagem (Logo)
 
-Ferramentas de edição integradas para logos:
-
-- 🧹 **Remover fundo** automático (cores claras/brancas)
-- 🎚️ **Sensibilidade de remoção** ajustável (0-255)
-- ☀️ **Ajuste de brilho** (-100 a +100)
-- 🔲 **Ajuste de contraste** (-100 a +100)
-- 🎨 **Ajuste de saturação** (-100 a +100)
-- 🌈 **Rotação de matiz** (0-360°) para alterar cores
-- 🔄 **Inverter cores** (efeito negativo)
-- 📍 **Posicionamento X e Y** independente
-- 📐 **Dimensões** ajustáveis
-- 🎭 **Profundidade 3D** com camadas empilhadas
+- 🖼️ **Upload PNG/JPG/WEBP**
+- 🧹 **Remover fundo** (cores claras) com sensibilidade
+- ☀️ **Brilho** e 🔲 **Contraste**
+- 🎨 **Saturacao** e 🌈 **Rotacao de matiz**
+- 🔄 **Inverter cores**
+- 📐 **Largura/altura** e 📍 **posicao X/Y**
+- 🎭 **Profundidade 3D** da logo
 
 ### Elementos da Placa
 
 #### Base
 
-- 🎨 **Cor personalizável**
-- 📏 **Altura ajustável** (0.5 padrão)
-- 📝 **Texto frontal** (Subtítulo) com controles completos
+- 🎨 **Cor personalizavel**
+- 📏 **Altura ajustavel**
+- 📝 **Texto frontal (Subtitulo)** com controles completos
 
-#### Top Plate (Chapa Superior)
+#### Chapa Superior (Top Plate)
 
 - 🎨 **Cor independente**
-- 📏 **Altura configurável**
+- 📏 **Altura configuravel**
 - 🔷 **6 estilos de aresta**:
-  - Flat (plana)
-  - Bevel (chanfrada)
-  - Bevel Suave
-  - Bevel Pronunciado
-  - Filleted (arredondada)
-  - Top-inset (curvada para dentro)
+  - Canto Vivo
+  - Chanfrado Padrao
+  - Chanfrado Leve
+  - Chanfrado Forte
+  - Filetado
+  - Topo Rebaixado
 
 ### Interface
 
-- 📦 **Menu lateral redimensionável** (200-600px)
-- 📋 **Seções expansíveis** organizadas por categoria
-- 🎛️ **Sliders interativos** com feedback visual em tempo real
-- 🎨 **Color pickers** integrados
-- 📂 **Upload de imagem** por drag-and-drop
+- 📦 **Menu lateral redimensionavel** (200-600px)
+- 📋 **Secoes expansiveis** por categoria
+- 🎛️ **Sliders interativos** com feedback visual
+- 🎨 **Seletores de cor** integrados
 
 ## 🔧 Tecnologias Utilizadas
 
