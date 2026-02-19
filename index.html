@@ -4,6 +4,10 @@
     <title><%= productName %></title>
 
     <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self'; connect-src 'self' https://threejs.org https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net"
+    />
     <meta name="description" content="<%= productDescription %>" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />

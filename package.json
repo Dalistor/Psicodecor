@@ -19,6 +19,7 @@
     "@quasar/extras": "^1.16.4",
     "electron-store": "^11.0.2",
     "idb": "^8.0.3",
+    "imagetracerjs": "^1.2.6",
     "quasar": "^2.16.0",
     "three": "^0.182.0",
     "troisjs": "^0.3.4",
