@@ -762,7 +762,7 @@ function initScene() {
 
 async function createModel() {
   if (!scene) return
-  
+
   // Evita chamadas concorrentes
   if (isCreatingModel) {
     return
@@ -791,7 +791,7 @@ async function createModel() {
     })
     scene.remove(oldGroup)
   }
-  
+
   // Força renderização para limpar cena visualmente
   if (renderer) {
     renderer.clear()
@@ -1020,7 +1020,7 @@ async function createModel() {
     renderer.clear()
     renderer.render(scene, camera)
   }
-  
+
   // Libera flag para permitir próxima criação
   isCreatingModel = false
 }
