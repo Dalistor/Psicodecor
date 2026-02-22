@@ -22,6 +22,10 @@ let isCreatingModel = false // Flag para evitar chamadas concorrentes
 
 const CANVAS_PX_PER_MM = 4
 
+function degToRad(deg) {
+  return (deg || 0) * Math.PI / 180
+}
+
 // Carrega fontes do Google Fonts
 function loadFonts() {
   if (fontLoaded) return
@@ -44,11 +48,15 @@ async function ensureFontLoaded(fontFace, fontWeight) {
   }
 }
 
+function getFontUrl(filename) {
+  return new URL(encodeURI(`fonts/${filename}`), window.location.href).toString()
+}
+
 // Mapa de fontes Google para fonts JSON (Three.js possui poucas fontes nativas)
 const fontLoadMap = {
   Arial: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
-  Roboto: '/fonts/Roboto_Regular.json',
-  'Open Sans': '/fonts/Open Sans_Regular.json',
+  Roboto: getFontUrl('Roboto_Regular.json'),
+  'Open Sans': getFontUrl('Open Sans_Regular.json'),
   Poppins:
     'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
   Montserrat:
@@ -87,12 +95,19 @@ const fontLoadMap = {
     'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
   'Dancing Script':
     'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
-  'Great Vibes': '/fonts/Great Vibes_Regular.json',
-  Allura: '/fonts/Allura_Regular.json',
+  'Great Vibes': getFontUrl('Great Vibes_Regular.json'),
+  Allura: getFontUrl('Allura_Regular.json'),
   Lobster: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/optimer_bold.typeface.json',
   Satisfy: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
   'Kaushan Script':
     'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
+}
+
+async function loadFontFromUrl(fontUrl) {
+  const loader = new FontLoader()
+  return await new Promise((resolve, reject) => {
+    loader.load(fontUrl, resolve, undefined, reject)
+  })
 }
 
 async function loadThreeFont(fontFace) {
@@ -100,20 +115,18 @@ async function loadThreeFont(fontFace) {
 
   const fontUrl = fontLoadMap[fontFace] || fontLoadMap.Roboto
   try {
-    const loader = new FontLoader()
-    const font = await new Promise((resolve, reject) => {
-      loader.load(fontUrl, resolve, undefined, reject)
-    })
+    const font = await loadFontFromUrl(fontUrl)
     fonts[fontFace] = font
     return font
   } catch {
-    // Fallback para Roboto se falhar
-    const loader = new FontLoader()
-    const font = await new Promise((resolve) => {
-      loader.load(fontLoadMap.Roboto, resolve)
-    })
-    fonts[fontFace] = font
-    return font
+    try {
+      const font = await loadFontFromUrl(fontLoadMap.Roboto)
+      fonts[fontFace] = font
+      return font
+    } catch (fallbackError) {
+      console.error('Erro ao carregar fonte:', fallbackError)
+      return null
+    }
   }
 }
 
@@ -138,6 +151,9 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
     }
 
     const font = await loadThreeFont(fontFace)
+    if (!font) {
+      return createTextLabel(text, fontSize, color, 'bold', fontFace, letterSpacing, depth, null)
+    }
 
     // fontSize agora está em mm
     const scaledSize = fontSize
@@ -173,6 +189,9 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
     })
 
     const mesh = new THREE.Mesh(geometry, material)
+    if (geometry.boundingBox) {
+      mesh.userData.height = geometry.boundingBox.max.y - geometry.boundingBox.min.y
+    }
     mesh.userData.isTextGeometry = true
     return mesh
   } catch (err) {
@@ -488,76 +507,7 @@ function processImage(imageBase64, options = {}) {
   })
 }
 
-function createExtrudedImageLabel(imageBase64, width, height, depth = 2) {
-  const texture = new THREE.TextureLoader().load(imageBase64)
-  texture.anisotropy = 16
-
-  const group = new THREE.Group()
-
-  // Material com textura para frente e trás
-  const textureMaterial = new THREE.MeshStandardMaterial({
-    map: texture,
-    transparent: true,
-    roughness: 0.4,
-    metalness: 0.1,
-  })
-
-  // Material para laterais (cor neutra escura)
-  const sideMaterial = new THREE.MeshStandardMaterial({
-    color: 0x333333,
-    roughness: 0.7,
-  })
-
-  // Material preto para o fundo
-  const backMaterial = new THREE.MeshStandardMaterial({
-    color: 0x000000,
-    roughness: 0.8,
-  })
-
-  // Face frontal (com textura)
-  const frontGeom = new THREE.PlaneGeometry(width, height)
-  const frontMesh = new THREE.Mesh(frontGeom, textureMaterial)
-  frontMesh.position.set(0, height / 2, depth / 2)
-  group.add(frontMesh)
-
-  // Face traseira (fundo preto, sem espelhar)
-  const backGeom = new THREE.PlaneGeometry(width, height)
-  const backMesh = new THREE.Mesh(backGeom, backMaterial)
-  backMesh.position.set(0, height / 2, -depth / 2)
-  backMesh.rotation.y = Math.PI
-  group.add(backMesh)
-
-  // Lateral direita
-  const rightGeom = new THREE.PlaneGeometry(depth, height)
-  const rightMesh = new THREE.Mesh(rightGeom, sideMaterial)
-  rightMesh.position.set(width / 2, height / 2, 0)
-  rightMesh.rotation.y = Math.PI / 2
-  group.add(rightMesh)
-
-  // Lateral esquerda
-  const leftGeom = new THREE.PlaneGeometry(depth, height)
-  const leftMesh = new THREE.Mesh(leftGeom, sideMaterial)
-  leftMesh.position.set(-width / 2, height / 2, 0)
-  leftMesh.rotation.y = -Math.PI / 2
-  group.add(leftMesh)
-
-  // Topo
-  const topGeom = new THREE.PlaneGeometry(width, depth)
-  const topMesh = new THREE.Mesh(topGeom, sideMaterial)
-  topMesh.position.set(0, height, 0)
-  topMesh.rotation.x = -Math.PI / 2
-  group.add(topMesh)
-
-  // Base
-  const bottomGeom = new THREE.PlaneGeometry(width, depth)
-  const bottomMesh = new THREE.Mesh(bottomGeom, sideMaterial)
-  bottomMesh.position.set(0, 0, 0)
-  bottomMesh.rotation.x = Math.PI / 2
-  group.add(bottomMesh)
-
-  group.userData.height = height
-  return group
-}
+// NOTE: Extrusao de imagem foi substituida por sprites empilhados.
 
 // Função para extrudar SVG (melhor solução para logos e letras)
 function createExtrudedSVG(svgDataUrl, depth = 2, color = '#ffffff', scale = 1, invertY = true) {
@@ -631,43 +581,54 @@ function createExtrudedSVG(svgDataUrl, depth = 2, color = '#ffffff', scale = 1, 
   })
 }
 
+function createStackedImageLabel(texture, width, height, depth = 2) {
+  const group = new THREE.Group()
+
+  const layers = Math.max(2, Math.ceil(depth * 2))
+  const step = depth / (layers - 1)
+  const startZ = -depth / 2
+
+  const geometry = new THREE.PlaneGeometry(width, height)
+  geometry.translate(0, height / 2, 0)
+
+  const material = new THREE.MeshStandardMaterial({
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide,
+    roughness: 0.5,
+  })
+
+  for (let i = 0; i < layers; i += 1) {
+    const mesh = new THREE.Mesh(geometry, material)
+    mesh.position.z = startZ + step * i
+    group.add(mesh)
+  }
+
+  group.userData.height = height
+  return group
+}
+
 function createImageLabel(imageBase64, width, height, depth = 0) {
   const texture = new THREE.TextureLoader().load(imageBase64)
   texture.anisotropy = 16
 
-  // Se não tem profundidade, usa plano simples
-  if (!depth || depth <= 0) {
-    const geometry = new THREE.PlaneGeometry(width, height)
-    geometry.translate(0, height / 2, 0)
-
-    const material = new THREE.MeshStandardMaterial({
-      map: texture,
-      transparent: true,
-      side: THREE.DoubleSide,
-      roughness: 0.5,
-    })
-
-    return new THREE.Mesh(geometry, material)
+  // Se tem profundidade, cria pilha de sprites para dar efeito 3D
+  if (depth && depth > 0) {
+    return createStackedImageLabel(texture, width, height, depth)
   }
 
-  // Se tem profundidade, cria geometria 3D sólida
-  const geometry = new THREE.BoxGeometry(width, height, depth)
+  // Sem profundidade, usa plano simples
+  const geometry = new THREE.PlaneGeometry(width, height)
   geometry.translate(0, height / 2, 0)
 
-  // Cor baseada na textura (usando cinza escuro como padrão para laterais)
-  const sideColor = 0x333333
+  const material = new THREE.MeshStandardMaterial({
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide,
+    roughness: 0.5,
+  })
 
-  // Materiais: textura na frente e atrás, cor sólida nas laterais
-  const materials = [
-    new THREE.MeshStandardMaterial({ color: sideColor, roughness: 0.5 }), // Lateral direita
-    new THREE.MeshStandardMaterial({ color: sideColor, roughness: 0.5 }), // Lateral esquerda
-    new THREE.MeshStandardMaterial({ color: sideColor, roughness: 0.5 }), // Topo
-    new THREE.MeshStandardMaterial({ color: sideColor, roughness: 0.5 }), // Base
-    new THREE.MeshStandardMaterial({ map: texture, transparent: true, roughness: 0.5 }), // Frente
-    new THREE.MeshStandardMaterial({ map: texture.clone(), transparent: true, roughness: 0.5 }), // Trás
-  ]
-
-  return new THREE.Mesh(geometry, materials)
+  return new THREE.Mesh(geometry, material)
 }
 
 function createTopInsetGeometry(width, height, depth, inset) {
@@ -690,19 +651,26 @@ function createTopInsetGeometry(width, height, depth, inset) {
 }
 
 function initScene() {
-  if (!container.value) return
+  try {
+    console.log('[SceneTemplate] initScene começando...')
+    if (!container.value) {
+      console.warn('[SceneTemplate] container.value não existe')
+      return
+    }
 
-  scene = new THREE.Scene()
-  scene.background = new THREE.Color(0xffffff)
+    scene = new THREE.Scene()
+    scene.background = new THREE.Color(0xffffff)
 
-  const width = container.value.clientWidth || window.innerWidth
-  const height = container.value.clientHeight || window.innerHeight
+    const width = container.value.clientWidth || window.innerWidth
+    const height = container.value.clientHeight || window.innerHeight
 
-  if (width === 0 || height === 0) {
-    console.warn('Container has no dimensions yet')
-    setTimeout(initScene, 100)
-    return
-  }
+    if (width === 0 || height === 0) {
+      console.warn('[SceneTemplate] Container has no dimensions yet')
+      setTimeout(initScene, 100)
+      return
+    }
+
+    console.log('[SceneTemplate] Criando camera e renderer...')
 
   camera = new THREE.PerspectiveCamera(35, width / height, 1, 4000)
   camera.position.set(
@@ -731,6 +699,13 @@ function initScene() {
     sceneConfig.camera.target.y,
     sceneConfig.camera.target.z,
   )
+  // Importante: define quais botões do mouse ativam os controles
+  // mouseButtons: LEFT = orbit, MIDDLE = zoom, RIGHT = pan
+  controls.mouseButtons = {
+    LEFT: THREE.MOUSE.ROTATE,
+    MIDDLE: THREE.MOUSE.DOLLY,
+    RIGHT: THREE.MOUSE.PAN,
+  }
   controls.update()
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.9))
@@ -758,6 +733,12 @@ function initScene() {
   setTimeout(() => onWindowResize(), 50)
   setTimeout(() => onWindowResize(), 150)
   setTimeout(() => onWindowResize(), 300)
+
+    console.log('[SceneTemplate] initScene completo')
+  } catch (error) {
+    console.error('[SceneTemplate] Erro ao inicializar cena:', error)
+    console.error('[SceneTemplate] Stack:', error?.stack)
+  }
 }
 
 async function createModel() {
@@ -899,6 +880,9 @@ async function createModel() {
       baseHeight + plateHeight + title.positionY,
       title.positionZ || 0,
     )
+    titleMesh.rotation.x = degToRad(title.rotationX)
+    titleMesh.rotation.y = degToRad(title.rotationY)
+    titleMesh.rotation.z = degToRad(title.rotationZ)
     group.add(titleMesh)
   }
 
@@ -920,9 +904,10 @@ async function createModel() {
       s.letterSpacing,
       s.depth,
     )
+    const subtitleHeight = subtitleMesh.userData.height || 0
     subtitleMesh.position.set(
       s.positionX,
-      baseHeight / 2 + s.positionY,
+      baseHeight / 2 - subtitleHeight / 2 + s.positionY,
       plateDepth / 2 + 0.5 + (s.positionZ || 0),
     )
   } else {
@@ -936,8 +921,12 @@ async function createModel() {
       s.depth,
       s.backgroundColor || null,
     )
-    subtitleMesh.position.set(s.positionX, 0, plateDepth / 2 + 0.5 + (s.positionZ || 0))
-    subtitleMesh.translateY(baseHeight / 2 - (subtitleMesh.userData.height || 0) / 2 + s.positionY)
+    const subtitleHeight = subtitleMesh.userData.height || 0
+    subtitleMesh.position.set(
+      s.positionX,
+      baseHeight / 2 - subtitleHeight / 2 + s.positionY,
+      plateDepth / 2 + 0.5 + (s.positionZ || 0),
+    )
   }
   group.add(subtitleMesh)
 
@@ -987,12 +976,8 @@ async function createModel() {
           invert: filters.invert ?? logo.invert,
         })
 
-        // Renderização 3D sólida com extrusão ou box
-        if (logoDepth > 0) {
-          logoMesh = createExtrudedImageLabel(processedImage, logoWidth, logoHeight, logoDepth)
-        } else {
-          logoMesh = createImageLabel(processedImage, logoWidth, logoHeight, logoDepth)
-        }
+        // Renderização com sprites empilhados para dar impressao 3D
+        logoMesh = createImageLabel(processedImage, logoWidth, logoHeight, logoDepth)
       }
     } else {
       logoMesh = new THREE.Mesh(
@@ -1010,6 +995,9 @@ async function createModel() {
       baseHeight + plateHeight + logoHeight / 2 + logo.positionY,
       logo.positionZ || 0,
     )
+    logoMesh.rotation.x += degToRad(logo.rotationX)
+    logoMesh.rotation.y += degToRad(logo.rotationY)
+    logoMesh.rotation.z += degToRad(logo.rotationZ)
     group.add(logoMesh)
   }
 
@@ -1089,34 +1077,50 @@ function setupResolutionMonitoring() {
 let resizeObserver = null
 
 onMounted(async () => {
-  await nextTick()
-  loadFonts()
-  initScene()
+  try {
+    console.log('[SceneTemplate] onMounted iniciado')
+    await nextTick()
+    loadFonts()
+    initScene()
 
-  // Listeners para resize
-  window.addEventListener('resize', debouncedResize)
+    // Listeners para resize
+    window.addEventListener('resize', debouncedResize)
 
-  // Setup de monitoramento de resolução/DPI
-  setupResolutionMonitoring()
-
-  // ResizeObserver para monitorar mudanças no tamanho do container (mais preciso)
-  if (container.value && window.ResizeObserver) {
-    resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
-          // Chama diretamente para ser mais responsivo
-          requestAnimationFrame(() => {
-            onWindowResize()
-          })
-        }
-      }
+    // Listener para reload de saves
+    window.addEventListener('reload-scene', () => {
+      createModel()
     })
-    resizeObserver.observe(container.value)
+
+    // Setup de monitoramento de resolução/DPI
+    setupResolutionMonitoring()
+
+    // ResizeObserver para monitorar mudanças no tamanho do container (mais preciso)
+    if (container.value && window.ResizeObserver) {
+      resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+            // Chama diretamente para ser mais responsivo
+            requestAnimationFrame(() => {
+              onWindowResize()
+            })
+          }
+        }
+      })
+      resizeObserver.observe(container.value)
+    }
+    console.log('[SceneTemplate] onMounted completo')
+  } catch (error) {
+    console.error('[SceneTemplate] Erro crítico no onMounted:', error)
+    console.error('[SceneTemplate] Stack:', error?.stack)
   }
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', debouncedResize)
+  window.removeEventListener('reload-scene', () => {
+    createModel()
+  })
+
   if (resizeTimeout) {
     clearTimeout(resizeTimeout)
   }
@@ -1156,12 +1160,31 @@ onBeforeUnmount(() => {
   }
 })
 
-// Throttle para evitar múltiplas reconstruções rápidas (~30fps)
+// Throttle para evitar múltiplas reconstruções rápidas
 let modelUpdateTimeout = null
 let lastModelUpdate = 0
-const modelUpdateInterval = 33
+const modelUpdateInterval = 300 // Aumentado para reduzir reconstruções
 
 function throttledModelUpdate() {
+  // Se um input tem foco, não atualiza a cena 3D
+  const activeElement = document.activeElement
+  const isInputFocused =
+    activeElement &&
+    (activeElement.tagName === 'INPUT' ||
+      activeElement.tagName === 'TEXTAREA' ||
+      activeElement.tagName === 'SELECT')
+
+  if (isInputFocused) {
+    // Agenda uma nova tentativa para depois que o input perder o foco
+    if (modelUpdateTimeout) {
+      clearTimeout(modelUpdateTimeout)
+    }
+    modelUpdateTimeout = setTimeout(() => {
+      throttledModelUpdate()
+    }, 500)
+    return
+  }
+
   const now = performance.now()
   const elapsed = now - lastModelUpdate
 
@@ -1184,6 +1207,9 @@ function throttledModelUpdate() {
 watch(
   () => parts,
   () => throttledModelUpdate(),
-  { deep: true },
+  {
+    deep: true,
+    flush: 'post', // Executa APÓS o DOM ser atualizado
+  },
 )
 </script>

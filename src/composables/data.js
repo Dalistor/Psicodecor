@@ -15,6 +15,9 @@ function createTextElement(text = '', depth = 1.5, positionX = 0, positionY = 0,
     positionX: positionX,
     positionY: positionY,
     positionZ: positionZ,
+    rotationX: 0,
+    rotationY: 0,
+    rotationZ: 0,
     renderType: 'textGeometry',
     backgroundColor: null,
   }
@@ -31,6 +34,9 @@ function createLogoElement() {
     positionX: -110,
     positionY: 0,
     positionZ: 0,
+    rotationX: 0,
+    rotationY: 0,
+    rotationZ: 0,
     depth: 2,
     renderType: 'boxObject', // 'boxObject' ou 'imageTexture'
     imageFilters: {
@@ -50,7 +56,7 @@ export const parts = reactive({
     width: 300,
     depth: 40,
     height: 25,
-    content: createTextElement('Profissão', 0, 0, -2, 0),
+    content: createTextElement('Profissão', 0, 0, 0, 0),
   },
   topPlate: {
     color: '#1a1a1a',

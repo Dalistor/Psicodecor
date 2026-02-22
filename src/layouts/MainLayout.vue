@@ -4,7 +4,7 @@
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
         <q-toolbar-title> Psicodecor </q-toolbar-title>
-        <q-btn flat dense round icon="file_download" @click="exportSTL" title="Exportar STL" />
+        <q-btn flat dense round icon="refresh" @click="reloadApp" title="Recarregar Aplicação" />
       </q-toolbar>
     </q-header>
 
@@ -88,6 +88,9 @@
     <q-page-container style="overflow: hidden; height: 100%">
       <router-view style="width: 100%; height: 100%; display: block" />
     </q-page-container>
+
+    <!-- Save Manager -->
+    <SaveManager />
   </q-layout>
 </template>
 
@@ -97,6 +100,7 @@ import { parts } from 'src/composables/data'
 import BaseEditorPanel from 'src/components/editor/BaseEditorPanel.vue'
 import TitleEditorPanel from 'src/components/editor/TitleEditorPanel.vue'
 import LogoEditorPanel from 'src/components/editor/LogoEditorPanel.vue'
+import SaveManager from 'src/components/SaveManager.vue'
 
 // Estado do layout
 const leftDrawerOpen = ref(false)
@@ -171,6 +175,9 @@ function addTitle() {
     positionX: 0,
     positionY: 6,
     positionZ: 0,
+    rotationX: 0,
+    rotationY: 0,
+    rotationZ: 0,
     renderType: 'textGeometry',
   })
 }
@@ -190,6 +197,9 @@ function addLogo() {
     positionX: 0,
     positionY: 0,
     positionZ: 0,
+    rotationX: 0,
+    rotationY: 0,
+    rotationZ: 0,
     depth: 2,
     imageFilters: {
       removeBgThreshold: 30,
@@ -215,10 +225,9 @@ function handleLogoUpload({ idx, file }) {
   reader.readAsDataURL(file)
 }
 
-// Exportar STL
-function exportSTL() {
-  // Será implementado junto com STLExporter
-  console.log('Exportar STL - será implementado')
+// Recarregar aplicação
+function reloadApp() {
+  location.reload()
 }
 
 // Funções de resize do drawer

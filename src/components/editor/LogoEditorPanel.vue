@@ -11,7 +11,7 @@
 
     <q-expansion-item
       v-for="(logo, idx) in logos"
-      :key="logo.id"
+      :key="logo.id || idx"
       :label="`${idx + 1}. ${logo.imageBase64 ? '✓ Logo' : 'Nova Logo'}`"
       icon="image"
       default-opened
@@ -20,15 +20,15 @@
     >
       <q-card class="bg-gray-9">
         <q-card-section class="q-gutter-md">
-          <!-- File input for logo (PNG ou SVG) -->
+          <!-- File input for logo (PNG, JPG ou SVG) -->
           <div>
             <q-file
               v-model="logoFiles[idx]"
-              label="Carregar Imagem (PNG/SVG)"
-              accept="image/png,image/svg+xml"
+              label="Carregar Imagem (PNG/JPG/SVG)"
+              accept="image/png,image/jpeg,image/svg+xml"
               @update:model-value="(file) => $emit('upload-logo', { idx, file })"
             >
-              <template v-slot:hint> PNG ou SVG apenas </template>
+              <template v-slot:hint> PNG, JPG ou SVG apenas </template>
             </q-file>
           </div>
 
@@ -65,7 +65,7 @@
 
           <!-- Posições -->
           <div>
-            <div class="text-caption">Posição X: {{ logo.positionX.toFixed(2) }}</div>
+            <div class="text-caption">Posição X: {{ (Number(logo.positionX) || 0).toFixed(2) }}</div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="logo.positionX"
@@ -88,7 +88,7 @@
           </div>
 
           <div>
-            <div class="text-caption">Posição Y: {{ logo.positionY.toFixed(2) }}</div>
+            <div class="text-caption">Posição Y: {{ (Number(logo.positionY) || 0).toFixed(2) }}</div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="logo.positionY"
@@ -110,7 +110,7 @@
             </div>
           </div>
           <div>
-            <div class="text-caption">Posição Z: {{ logo.positionZ.toFixed(2) }}</div>
+            <div class="text-caption">Posição Z: {{ (Number(logo.positionZ) || 0).toFixed(2) }}</div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="logo.positionZ"
@@ -127,6 +127,72 @@
                 dark
                 outlined
                 :step="0.01"
+                style="width: 80px"
+              />
+            </div>
+          </div>
+          <div>
+            <div class="text-caption">Rotação X: {{ (Number(logo.rotationX) || 0).toFixed(0) }}°</div>
+            <div class="row q-gutter-sm items-center">
+              <q-slider
+                v-model.number="logo.rotationX"
+                :min="-180"
+                :max="180"
+                :step="1"
+                dark
+                class="col"
+              />
+              <q-input
+                v-model.number="logo.rotationX"
+                type="number"
+                dense
+                dark
+                outlined
+                :step="1"
+                style="width: 80px"
+              />
+            </div>
+          </div>
+          <div>
+            <div class="text-caption">Rotação Y: {{ (Number(logo.rotationY) || 0).toFixed(0) }}°</div>
+            <div class="row q-gutter-sm items-center">
+              <q-slider
+                v-model.number="logo.rotationY"
+                :min="-180"
+                :max="180"
+                :step="1"
+                dark
+                class="col"
+              />
+              <q-input
+                v-model.number="logo.rotationY"
+                type="number"
+                dense
+                dark
+                outlined
+                :step="1"
+                style="width: 80px"
+              />
+            </div>
+          </div>
+          <div>
+            <div class="text-caption">Rotação Z: {{ (Number(logo.rotationZ) || 0).toFixed(0) }}°</div>
+            <div class="row q-gutter-sm items-center">
+              <q-slider
+                v-model.number="logo.rotationZ"
+                :min="-180"
+                :max="180"
+                :step="1"
+                dark
+                class="col"
+              />
+              <q-input
+                v-model.number="logo.rotationZ"
+                type="number"
+                dense
+                dark
+                outlined
+                :step="1"
                 style="width: 80px"
               />
             </div>
@@ -234,6 +300,18 @@ const defaultFilters = {
 
 watchEffect(() => {
   props.logos.forEach((logo) => {
+    logo.positionX = Number(logo.positionX) || 0
+    logo.positionY = Number(logo.positionY) || 0
+    logo.positionZ = Number(logo.positionZ) || 0
+    if (logo.rotationX === undefined || logo.rotationX === null) {
+      logo.rotationX = 0
+    }
+    if (logo.rotationY === undefined || logo.rotationY === null) {
+      logo.rotationY = 0
+    }
+    if (logo.rotationZ === undefined || logo.rotationZ === null) {
+      logo.rotationZ = 0
+    }
     if (!logo.imageFilters) {
       logo.imageFilters = { ...defaultFilters }
       return

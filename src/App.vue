@@ -22,5 +22,14 @@ body,
 </style>
 
 <script setup>
-//
+import { onErrorCaptured } from 'vue'
+
+// Captura erros globais
+onErrorCaptured((err) => {
+  console.error('[App] Erro crítico capturado:', err)
+  console.error('[App] Stack:', err?.stack)
+  return false // Impede propagação
+})
+
+console.log('[App] Psicodecor iniciado')
 </script>

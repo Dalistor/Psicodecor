@@ -11,7 +11,7 @@
 
     <q-expansion-item
       v-for="(title, idx) in titles"
-      :key="title.id"
+      :key="title.id || idx"
       :label="`${idx + 1}. ${title.text || 'Novo Título'}`"
       icon="text_fields"
       default-opened
@@ -84,7 +84,7 @@
             </div>
           </div>
           <div>
-            <div class="text-caption">Posição X: {{ title.positionX.toFixed(2) }}</div>
+            <div class="text-caption">Posição X: {{ (Number(title.positionX) || 0).toFixed(2) }}</div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="title.positionX"
@@ -106,7 +106,7 @@
             </div>
           </div>
           <div>
-            <div class="text-caption">Posição Y: {{ title.positionY.toFixed(2) }}</div>
+            <div class="text-caption">Posição Y: {{ (Number(title.positionY) || 0).toFixed(2) }}</div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="title.positionY"
@@ -128,7 +128,7 @@
             </div>
           </div>
           <div>
-            <div class="text-caption">Posição Z: {{ title.positionZ.toFixed(2) }}</div>
+            <div class="text-caption">Posição Z: {{ (Number(title.positionZ) || 0).toFixed(2) }}</div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="title.positionZ"
@@ -149,6 +149,72 @@
               />
             </div>
           </div>
+          <div>
+            <div class="text-caption">Rotação X: {{ (Number(title.rotationX) || 0).toFixed(0) }}°</div>
+            <div class="row q-gutter-sm items-center">
+              <q-slider
+                v-model.number="title.rotationX"
+                :min="-180"
+                :max="180"
+                :step="1"
+                dark
+                class="col"
+              />
+              <q-input
+                v-model.number="title.rotationX"
+                type="number"
+                dense
+                dark
+                outlined
+                :step="1"
+                style="width: 80px"
+              />
+            </div>
+          </div>
+          <div>
+            <div class="text-caption">Rotação Y: {{ (Number(title.rotationY) || 0).toFixed(0) }}°</div>
+            <div class="row q-gutter-sm items-center">
+              <q-slider
+                v-model.number="title.rotationY"
+                :min="-180"
+                :max="180"
+                :step="1"
+                dark
+                class="col"
+              />
+              <q-input
+                v-model.number="title.rotationY"
+                type="number"
+                dense
+                dark
+                outlined
+                :step="1"
+                style="width: 80px"
+              />
+            </div>
+          </div>
+          <div>
+            <div class="text-caption">Rotação Z: {{ (Number(title.rotationZ) || 0).toFixed(0) }}°</div>
+            <div class="row q-gutter-sm items-center">
+              <q-slider
+                v-model.number="title.rotationZ"
+                :min="-180"
+                :max="180"
+                :step="1"
+                dark
+                class="col"
+              />
+              <q-input
+                v-model.number="title.rotationZ"
+                type="number"
+                dense
+                dark
+                outlined
+                :step="1"
+                style="width: 80px"
+              />
+            </div>
+          </div>
           <q-btn
             color="negative"
             icon="delete"
@@ -164,7 +230,8 @@
 </template>
 
 <script setup>
-defineProps({
+import { watchEffect } from 'vue'
+const props = defineProps({
   titles: {
     type: Array,
     required: true,
@@ -180,4 +247,22 @@ defineProps({
 })
 
 defineEmits(['add-title', 'delete-title'])
+
+watchEffect(() => {
+  if (!Array.isArray(props.titles)) return
+  props.titles.forEach((title) => {
+    title.positionX = Number(title.positionX) || 0
+    title.positionY = Number(title.positionY) || 0
+    title.positionZ = Number(title.positionZ) || 0
+    if (title.rotationX === undefined || title.rotationX === null) {
+      title.rotationX = 0
+    }
+    if (title.rotationY === undefined || title.rotationY === null) {
+      title.rotationY = 0
+    }
+    if (title.rotationZ === undefined || title.rotationZ === null) {
+      title.rotationZ = 0
+    }
+  })
+})
 </script>
