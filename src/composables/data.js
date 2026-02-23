@@ -3,14 +3,21 @@ import { reactive } from 'vue'
 // Sistema em mm: valores salvos em milimetros
 
 // Helper para criar elemento de texto padrão
-function createTextElement(text = '', depth = 1.5, positionX = 0, positionY = 0, positionZ = 0) {
+function createTextElement(
+  text = '',
+  depth = 1.5,
+  positionX = 0,
+  positionY = 0,
+  positionZ = 0,
+  fontSize = 18,
+) {
   return {
     id: Date.now() + Math.random(),
     text,
     font: 'Roboto',
-    fontSize: 18,
+    fontSize: fontSize,
     color: '#ffd500',
-    letterSpacing: 0.8,
+    letterSpacing: 0,
     depth: depth,
     positionX: positionX,
     positionY: positionY,
@@ -56,7 +63,7 @@ export const parts = reactive({
     width: 300,
     depth: 40,
     height: 25,
-    content: createTextElement('Profissão', 0, 0, 0, 0),
+    content: createTextElement('Profissão', 0.5, 0, 0, 0, 12),
   },
   topPlate: {
     color: '#1a1a1a',
@@ -65,12 +72,12 @@ export const parts = reactive({
   },
   titles: [
     {
-      ...createTextElement('Nome', 1.5, 30, 0, 0),
+      ...createTextElement('Nome', 1.5, 30, 0, 0, 18),
       id: 'title-main',
       fontSize: 25,
       font: 'Roboto',
-      letterSpacing: 1.0,
-      positionY: 6,
+      letterSpacing: 0,
+      positionY: 1,
     },
   ],
   logos: [createLogoElement()],

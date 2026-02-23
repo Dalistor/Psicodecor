@@ -13,7 +13,13 @@
       show-if-above
       bordered
       class="bg-gray-8"
-      style="overflow-y: hidden; position: relative; display: flex; flex-direction: column"
+      style="
+        overflow-y: hidden; 
+        position: relative; 
+        display: flex; 
+        flex-direction: column;
+        pointer-events: auto;
+      "
       :width="drawerWidth"
     >
       <div
@@ -233,3 +239,21 @@ onBeforeUnmount(() => {
   document.removeEventListener('mouseup', stopResize)
 })
 </script>
+
+<style scoped>
+/* Permitir que a página e o canvas recebam eventos mesmo com drawer aberto */
+:deep(.q-page-container) {
+  pointer-events: auto;
+  z-index: 0;
+}
+
+/* Garantir que o canvas do Three.js está acessível */
+:deep(canvas) {
+  pointer-events: auto;
+}
+
+/* O drawer fica acima mas sem bloquear a página */
+:deep(.q-drawer__content) {
+  pointer-events: auto;
+}
+</style>

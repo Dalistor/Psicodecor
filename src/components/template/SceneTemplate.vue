@@ -1,7 +1,15 @@
 <template>
   <div
     ref="container"
-    style="width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; display: block"
+    style="
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      display: block;
+      pointer-events: auto;
+    "
   />
 </template>
 
@@ -123,9 +131,10 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
         metalness: 0.1,
       })
 
-      let cursorX = 0
+      const meshes = []
       let maxHeight = 0
 
+      // Primeira passagem: criar geometrias e medir
       for (const ch of safeText) {
         if (ch === '\n') {
           continue
@@ -161,18 +170,24 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
         charGeometry.translate(-offsetX, -offsetY, -offsetZ)
 
         const mesh = new THREE.Mesh(charGeometry, material)
-        mesh.position.x = cursorX + width / 2
-        group.add(mesh)
-
-        cursorX += width + spacing
+        meshes.push({ mesh, width })
       }
 
-      if (group.children.length === 0) {
+      if (meshes.length === 0) {
         return null
       }
 
-      const totalWidth = Math.max(0, cursorX - spacing)
-      group.position.x = -totalWidth / 2
+      // Calcular largura total incluindo espaçamentos
+      const totalWidth = meshes.reduce((sum, m) => sum + m.width, 0) + spacing * Math.max(0, meshes.length - 1)
+      
+      // Segunda passagem: posicionar a partir do centro
+      let cursorX = -totalWidth / 2
+      for (const { mesh, width } of meshes) {
+        mesh.position.x = cursorX + width / 2
+        group.add(mesh)
+        cursorX += width + spacing
+      }
+
       group.userData.height = maxHeight
       group.userData.isTextGeometry = true
       return group

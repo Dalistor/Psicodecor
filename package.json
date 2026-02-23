@@ -1,6 +1,6 @@
 {
   "name": "psicodecor",
-  "version": "0.0.1",
+  "version": "1.2.5",
   "description": "Um programa de edição de uma logo padrão",
   "productName": "Psicodecor Editor",
   "author": "Dalistor <diego.sil.cabral@gmail.com>",
@@ -11,8 +11,15 @@
     "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev -m electron",
-    "build:linux": "quasar build -m electron -T linux",
-    "build:win": "quasar build -m electron -T win32",
+    "bump:patch": "node bump-version.js patch",
+    "bump:minor": "node bump-version.js minor",
+    "bump:major": "node bump-version.js major",
+    "build:linux": "npm run bump:patch && quasar build -m electron -T linux",
+    "build:win": "npm run bump:patch && quasar build -m electron -T win32",
+    "build:linux:minor": "npm run bump:minor && quasar build -m electron -T linux",
+    "build:win:minor": "npm run bump:minor && quasar build -m electron -T win32",
+    "build:linux:major": "npm run bump:major && quasar build -m electron -T linux",
+    "build:win:major": "npm run bump:major && quasar build -m electron -T win32",
     "postinstall": "quasar prepare"
   },
   "dependencies": {
