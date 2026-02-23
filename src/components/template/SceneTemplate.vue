@@ -178,8 +178,9 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
       }
 
       // Calcular largura total incluindo espaçamentos
-      const totalWidth = meshes.reduce((sum, m) => sum + m.width, 0) + spacing * Math.max(0, meshes.length - 1)
-      
+      const totalWidth =
+        meshes.reduce((sum, m) => sum + m.width, 0) + spacing * Math.max(0, meshes.length - 1)
+
       // Segunda passagem: posicionar a partir do centro
       let cursorX = -totalWidth / 2
       for (const { mesh, width } of meshes) {

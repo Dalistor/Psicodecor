@@ -14,9 +14,9 @@
       bordered
       class="bg-gray-8"
       style="
-        overflow-y: hidden; 
-        position: relative; 
-        display: flex; 
+        overflow-y: hidden;
+        position: relative;
+        display: flex;
         flex-direction: column;
         pointer-events: auto;
       "
