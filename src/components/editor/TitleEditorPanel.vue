@@ -84,7 +84,9 @@
             </div>
           </div>
           <div>
-            <div class="text-caption">Posição X: {{ (Number(title.positionX) || 0).toFixed(2) }}</div>
+            <div class="text-caption">
+              Posição X: {{ (Number(title.positionX) || 0).toFixed(2) }}
+            </div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="title.positionX"
@@ -106,7 +108,9 @@
             </div>
           </div>
           <div>
-            <div class="text-caption">Posição Y: {{ (Number(title.positionY) || 0).toFixed(2) }}</div>
+            <div class="text-caption">
+              Posição Y: {{ (Number(title.positionY) || 0).toFixed(2) }}
+            </div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="title.positionY"
@@ -128,7 +132,9 @@
             </div>
           </div>
           <div>
-            <div class="text-caption">Posição Z: {{ (Number(title.positionZ) || 0).toFixed(2) }}</div>
+            <div class="text-caption">
+              Posição Z: {{ (Number(title.positionZ) || 0).toFixed(2) }}
+            </div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="title.positionZ"
@@ -150,7 +156,9 @@
             </div>
           </div>
           <div>
-            <div class="text-caption">Rotação X: {{ (Number(title.rotationX) || 0).toFixed(0) }}°</div>
+            <div class="text-caption">
+              Rotação X: {{ (Number(title.rotationX) || 0).toFixed(0) }}°
+            </div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="title.rotationX"
@@ -172,7 +180,9 @@
             </div>
           </div>
           <div>
-            <div class="text-caption">Rotação Y: {{ (Number(title.rotationY) || 0).toFixed(0) }}°</div>
+            <div class="text-caption">
+              Rotação Y: {{ (Number(title.rotationY) || 0).toFixed(0) }}°
+            </div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="title.rotationY"
@@ -194,7 +204,9 @@
             </div>
           </div>
           <div>
-            <div class="text-caption">Rotação Z: {{ (Number(title.rotationZ) || 0).toFixed(0) }}°</div>
+            <div class="text-caption">
+              Rotação Z: {{ (Number(title.rotationZ) || 0).toFixed(0) }}°
+            </div>
             <div class="row q-gutter-sm items-center">
               <q-slider
                 v-model.number="title.rotationZ"

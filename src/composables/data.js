@@ -7,7 +7,7 @@ function createTextElement(text = '', depth = 1.5, positionX = 0, positionY = 0,
   return {
     id: Date.now() + Math.random(),
     text,
-    font: 'Arial',
+    font: 'Roboto',
     fontSize: 18,
     color: '#ffd500',
     letterSpacing: 0.8,
@@ -61,7 +61,7 @@ export const parts = reactive({
   topPlate: {
     color: '#1a1a1a',
     height: 5,
-    style: 'bevel',
+    style: 'top-inset',
   },
   titles: [
     {

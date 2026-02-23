@@ -20,22 +20,15 @@ let fontLoaded = false
 let fonts = {} // Cache de fontes carregadas
 let isCreatingModel = false // Flag para evitar chamadas concorrentes
 
-const CANVAS_PX_PER_MM = 4
-
 function degToRad(deg) {
-  return (deg || 0) * Math.PI / 180
+  return ((deg || 0) * Math.PI) / 180
 }
 
-// Carrega fontes do Google Fonts
 function loadFonts() {
   if (fontLoaded) return
 
-  // Link para todas as fontes Google usadas no projeto
-  const link = document.createElement('link')
-  link.href =
-    'https://fonts.googleapis.com/css2?family=Arial&family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Poppins:wght@400;700&family=Montserrat:wght@400;700&family=Playfair+Display:wght@400;700&family=Lato:wght@400;700&family=Ubuntu:wght@400;700&family=Nunito:wght@400;700&family=Raleway:wght@400;700&family=Merriweather:wght@400;700&family=Oswald:wght@400;700&family=Source+Sans+3:wght@400;700&family=Bebas+Neue&family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;700&family=Abril+Fatface&family=Archivo+Black&family=Fjalla+One&family=Josefin+Sans:wght@400;700&family=Pacifico&family=Bangers&family=Orbitron:wght@400;700&family=Righteous&family=Rajdhani:wght@400;700&family=Sacramento&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Allura&family=Lobster&family=Satisfy&family=Kaushan+Script&display=swap'
-  link.rel = 'stylesheet'
-  document.head.appendChild(link)
+  // Fontes usadas no canvas dependem de fontes instaladas no sistema.
+  // As fontes 3D sao carregadas apenas via JSON em public/fonts.
   fontLoaded = true
 }
 
@@ -54,53 +47,14 @@ function getFontUrl(filename) {
 
 // Mapa de fontes Google para fonts JSON (Three.js possui poucas fontes nativas)
 const fontLoadMap = {
-  Arial: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
-  Roboto: getFontUrl('Roboto_Regular.json'),
-  'Open Sans': getFontUrl('Open Sans_Regular.json'),
-  Poppins:
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
-  Montserrat:
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
-  Lato: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
-  Ubuntu: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
-  Nunito: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
-  Raleway:
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
-  'Source Sans 3':
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
-  Oswald: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/optimer_bold.typeface.json',
-  'Bebas Neue':
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/optimer_bold.typeface.json',
-  'Archivo Black':
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/optimer_bold.typeface.json',
-  'Fjalla One':
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/optimer_bold.typeface.json',
-  Orbitron: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/optimer_bold.typeface.json',
-  Rajdhani: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/optimer_bold.typeface.json',
-  Righteous: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/optimer_bold.typeface.json',
-  'Playfair Display':
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
-  Merriweather:
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
-  Cinzel: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
-  'Cormorant Garamond':
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
-  'Abril Fatface':
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
-  'Josefin Sans':
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/helvetiker_bold.typeface.json',
-  Pacifico: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
-  Bangers: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/optimer_bold.typeface.json',
-  Sacramento:
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
-  'Dancing Script':
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
-  'Great Vibes': getFontUrl('Great Vibes_Regular.json'),
-  Allura: getFontUrl('Allura_Regular.json'),
-  Lobster: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/optimer_bold.typeface.json',
-  Satisfy: 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
-  'Kaushan Script':
-    'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/fonts/gentilis_bold.typeface.json',
+  Roboto: getFontUrl('Roboto-VariableFont_wdth,wght.json'),
+  'Open Sans': getFontUrl('OpenSans-VariableFont_wdth,wght.json'),
+  'Great Vibes': getFontUrl('GreatVibes-Regular.json'),
+  Allura: getFontUrl('Allura-Regular.json'),
+  'Alex Brush': getFontUrl('AlexBrush-Regular.json'),
+  Merriweather: getFontUrl('Merriweather-VariableFont_opsz,wdth,wght.json'),
+  'Playfair Display': getFontUrl('PlayfairDisplay-VariableFont_wght.json'),
+  Ubuntu: getFontUrl('Ubuntu-Regular.json'),
 }
 
 async function loadFontFromUrl(fontUrl) {
@@ -135,30 +89,96 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
     // TextGeometry tem limitações com caracteres especiais
     // Vamos normalizar o texto e alertar o usuário sobre limitações
 
-    // Caracteres suportados pela maioria das fontes JSON
-    const supportedCharset = /[a-zA-Z0-9 \-.,!?;:'"()[\]{}@#$%^&*+=<>/\\/|`~ªºñíéáóú]/
-    const unsupported = text
-      .split('')
+    // Caracteres suportados: ASCII + Latin Extended (inclui acentos: ã, õ, ç, é, á, etc)
+    // Aceita: U+0020-U+007E (ASCII) + U+00A0-U+00FF (Latin-1 Supplement) + U+0100-U+017F (Latin Extended-A)
+    const supportedCharset = /[\u0020-\u007E\u00A0-\u00FF\u0100-\u017F]/
+    const rawChars = text.split('')
+    const unsupported = rawChars
       .filter((ch) => !supportedCharset.test(ch))
       .map((ch) => ch.charCodeAt(0))
 
     if (unsupported.length > 0) {
       console.warn(
-        `TextGeometry: Caracteres especiais não suportados em 3D (${unsupported.join(', ')}). Usando fallback para canvas.`,
+        `TextGeometry: Caracteres nao presentes nos glyphs da fonte (${unsupported.join(', ')}). Substituindo por '?'.`,
       )
-      // Retorna fallback
-      return createTextLabel(text, fontSize, color, 'bold', fontFace, letterSpacing, depth, null)
     }
+
+    const safeText = rawChars.map((ch) => (supportedCharset.test(ch) ? ch : '?')).join('')
+
+    const spacing = Number(letterSpacing) || 0
 
     const font = await loadThreeFont(fontFace)
     if (!font) {
-      return createTextLabel(text, fontSize, color, 'bold', fontFace, letterSpacing, depth, null)
+      return null
     }
 
     // fontSize agora está em mm
     const scaledSize = fontSize
 
-    const geometry = new TextGeometry(text, {
+    if (Math.abs(spacing) > 0.001) {
+      const group = new THREE.Group()
+      const material = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(color),
+        roughness: 0.4,
+        metalness: 0.1,
+      })
+
+      let cursorX = 0
+      let maxHeight = 0
+
+      for (const ch of safeText) {
+        if (ch === '\n') {
+          continue
+        }
+
+        const charGeometry = new TextGeometry(ch, {
+          font: font,
+          size: scaledSize,
+          depth: depth,
+          curveSegments: 4,
+          bevelEnabled: depth > 0,
+          bevelThickness: depth * 0.5,
+          bevelSize: depth * 0.3,
+          bevelSegments: 3,
+          bevelOffset: 0,
+          lineHeight: 1.2,
+        })
+
+        charGeometry.computeBoundingBox()
+        if (!charGeometry.boundingBox) {
+          continue
+        }
+
+        const bbox = charGeometry.boundingBox
+        const width = bbox.max.x - bbox.min.x
+        const height = bbox.max.y - bbox.min.y
+        maxHeight = Math.max(maxHeight, height)
+
+        const offsetX = (bbox.max.x + bbox.min.x) / 2
+        const baselinePadding = Math.max(0.5, fontSize * 0.08)
+        const offsetY = bbox.min.y + baselinePadding
+        const offsetZ = (bbox.max.z + bbox.min.z) / 2
+        charGeometry.translate(-offsetX, -offsetY, -offsetZ)
+
+        const mesh = new THREE.Mesh(charGeometry, material)
+        mesh.position.x = cursorX + width / 2
+        group.add(mesh)
+
+        cursorX += width + spacing
+      }
+
+      if (group.children.length === 0) {
+        return null
+      }
+
+      const totalWidth = Math.max(0, cursorX - spacing)
+      group.position.x = -totalWidth / 2
+      group.userData.height = maxHeight
+      group.userData.isTextGeometry = true
+      return group
+    }
+
+    const geometry = new TextGeometry(safeText, {
       font: font,
       size: scaledSize,
       depth: depth,
@@ -169,7 +189,7 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
       bevelSegments: 3,
       bevelOffset: 0,
       lineHeight: 1.2,
-      letterSpacing: (letterSpacing / Math.max(fontSize, 0.01)) * scaledSize * 0.5,
+      letterSpacing: (spacing / Math.max(fontSize, 0.01)) * scaledSize * 0.5,
     })
 
     geometry.computeBoundingBox()
@@ -196,175 +216,8 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
     return mesh
   } catch (err) {
     console.error('Erro ao criar TextGeometry:', err)
-    // Fallback para boxObject
-    return createTextLabel(text, fontSize, color, 'bold', fontFace, letterSpacing, depth, null)
+    return null
   }
-}
-
-function createTextLabel(
-  text,
-  fontSize,
-  color,
-  fontWeight = 'bold',
-  fontFace = 'Arial',
-  letterSpacing = 0,
-  depth = 0,
-  backgroundColor = null,
-) {
-  const canvas = document.createElement('canvas')
-  const context = canvas.getContext('2d')
-
-  const lines = text.split('\n')
-  const fontSizePx = Math.max(1, fontSize * CANVAS_PX_PER_MM)
-  const letterSpacingPx = letterSpacing * CANVAS_PX_PER_MM
-  const lineHeight = fontSizePx * 1.0
-  context.font = `${fontWeight} ${fontSizePx}px "${fontFace}", Arial, sans-serif`
-
-  let maxLineWidth = 0
-  lines.forEach((line) => {
-    let width = 0
-    if (letterSpacingPx !== 0) {
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i]
-        width += context.measureText(ch).width
-        if (i < line.length - 1) width += letterSpacingPx
-      }
-    } else {
-      width = context.measureText(line).width
-    }
-    if (width > maxLineWidth) maxLineWidth = width
-  })
-
-  // Adiciona padding para centralizar melhor o texto
-  const paddingX = 20
-  const paddingY = lineHeight * 0.5 // Padding proporcional ao tamanho da fonte
-
-  canvas.width = maxLineWidth + paddingX * 2
-  canvas.height = lineHeight * lines.length + paddingY * 2
-
-  context.font = `${fontWeight} ${fontSizePx}px "${fontFace}", Arial, sans-serif`
-
-  // Fill background if provided
-  if (backgroundColor) {
-    context.fillStyle = backgroundColor
-    context.fillRect(0, 0, canvas.width, canvas.height)
-  }
-
-  context.fillStyle = color
-  context.textAlign = 'left'
-  context.textBaseline = 'middle' // Mudado para middle para melhor centralização
-
-  lines.forEach((line, index) => {
-    // Centraliza verticalmente considerando o padding
-    const yPos = paddingY + lineHeight * (index + 0.5)
-
-    if (letterSpacingPx !== 0) {
-      let xPos = paddingX + (maxLineWidth - 0) / 2
-      // Calcula largura total da linha com letter spacing
-      let totalLineWidth = 0
-      for (let i = 0; i < line.length; i++) {
-        totalLineWidth += context.measureText(line[i]).width
-        if (i < line.length - 1) totalLineWidth += letterSpacingPx
-      }
-      xPos = paddingX + (maxLineWidth - totalLineWidth) / 2
-
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i]
-        context.fillText(ch, xPos, yPos)
-        xPos += context.measureText(ch).width
-        if (i < line.length - 1) xPos += letterSpacingPx
-      }
-    } else {
-      const textWidth = context.measureText(line).width
-      const xPos = paddingX + (maxLineWidth - textWidth) / 2
-      context.fillText(line, xPos, yPos)
-    }
-  })
-
-  const texture = new THREE.CanvasTexture(canvas)
-  texture.anisotropy = 16
-
-  const ratio = canvas.width / canvas.height
-  // Altura em mm
-  const pHeight = fontSize
-  const pWidth = pHeight * ratio
-
-  // Se não tem profundidade, usa plano simples
-  if (!depth || depth <= 0) {
-    const geometry = new THREE.PlaneGeometry(pWidth, pHeight)
-    geometry.translate(0, pHeight / 2, 0)
-
-    const material = new THREE.MeshStandardMaterial({
-      map: texture,
-      transparent: true,
-      side: THREE.DoubleSide,
-      roughness: 0.5,
-    })
-
-    const mesh = new THREE.Mesh(geometry, material)
-    mesh.userData.height = pHeight
-    return mesh
-  }
-
-  // Se tem profundidade, cria objeto 3D sólido usando faces separadas
-  const group = new THREE.Group()
-
-  // Material com textura do texto para frente e trás
-  const textureMaterial = new THREE.MeshStandardMaterial({
-    map: texture,
-    transparent: true,
-    roughness: 0.5,
-  })
-
-  // Material para laterais (cor do texto)
-  const sideMaterial = new THREE.MeshStandardMaterial({
-    color: color,
-    roughness: 0.6,
-  })
-
-  // Face frontal (com textura do texto)
-  const frontGeom = new THREE.PlaneGeometry(pWidth, pHeight)
-  const frontMesh = new THREE.Mesh(frontGeom, textureMaterial)
-  frontMesh.position.set(0, pHeight / 2, depth / 2)
-  group.add(frontMesh)
-
-  // Face traseira (com textura do texto)
-  const backGeom = new THREE.PlaneGeometry(pWidth, pHeight)
-  const backMesh = new THREE.Mesh(backGeom, textureMaterial)
-  backMesh.position.set(0, pHeight / 2, -depth / 2)
-  backMesh.rotation.y = Math.PI
-  group.add(backMesh)
-
-  // Lateral direita
-  const rightGeom = new THREE.PlaneGeometry(depth, pHeight)
-  const rightMesh = new THREE.Mesh(rightGeom, sideMaterial)
-  rightMesh.position.set(pWidth / 2, pHeight / 2, 0)
-  rightMesh.rotation.y = Math.PI / 2
-  group.add(rightMesh)
-
-  // Lateral esquerda
-  const leftGeom = new THREE.PlaneGeometry(depth, pHeight)
-  const leftMesh = new THREE.Mesh(leftGeom, sideMaterial)
-  leftMesh.position.set(-pWidth / 2, pHeight / 2, 0)
-  leftMesh.rotation.y = -Math.PI / 2
-  group.add(leftMesh)
-
-  // Topo
-  const topGeom = new THREE.PlaneGeometry(pWidth, depth)
-  const topMesh = new THREE.Mesh(topGeom, sideMaterial)
-  topMesh.position.set(0, pHeight, 0)
-  topMesh.rotation.x = -Math.PI / 2
-  group.add(topMesh)
-
-  // Base
-  const bottomGeom = new THREE.PlaneGeometry(pWidth, depth)
-  const bottomMesh = new THREE.Mesh(bottomGeom, sideMaterial)
-  bottomMesh.position.set(0, 0, 0)
-  bottomMesh.rotation.x = Math.PI / 2
-  group.add(bottomMesh)
-
-  group.userData.height = pHeight
-  return group
 }
 
 function processImage(imageBase64, options = {}) {
@@ -672,67 +525,67 @@ function initScene() {
 
     console.log('[SceneTemplate] Criando camera e renderer...')
 
-  camera = new THREE.PerspectiveCamera(35, width / height, 1, 4000)
-  camera.position.set(
-    sceneConfig.camera.position.x,
-    sceneConfig.camera.position.y,
-    sceneConfig.camera.position.z,
-  )
+    camera = new THREE.PerspectiveCamera(35, width / height, 1, 4000)
+    camera.position.set(
+      sceneConfig.camera.position.x,
+      sceneConfig.camera.position.y,
+      sceneConfig.camera.position.z,
+    )
 
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
-  renderer.setSize(width, height, false)
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-  renderer.setClearColor(0xffffff)
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
+    renderer.setSize(width, height, false)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer.setClearColor(0xffffff)
 
-  // Garante que o canvas preencha todo o container
-  renderer.domElement.style.width = '100%'
-  renderer.domElement.style.height = '100%'
-  renderer.domElement.style.display = 'block'
+    // Garante que o canvas preencha todo o container
+    renderer.domElement.style.width = '100%'
+    renderer.domElement.style.height = '100%'
+    renderer.domElement.style.display = 'block'
 
-  container.value.appendChild(renderer.domElement)
+    container.value.appendChild(renderer.domElement)
 
-  controls = new OrbitControls(camera, renderer.domElement)
-  controls.enableDamping = true
-  controls.autoRotate = false
-  controls.target.set(
-    sceneConfig.camera.target.x,
-    sceneConfig.camera.target.y,
-    sceneConfig.camera.target.z,
-  )
-  // Importante: define quais botões do mouse ativam os controles
-  // mouseButtons: LEFT = orbit, MIDDLE = zoom, RIGHT = pan
-  controls.mouseButtons = {
-    LEFT: THREE.MOUSE.ROTATE,
-    MIDDLE: THREE.MOUSE.DOLLY,
-    RIGHT: THREE.MOUSE.PAN,
-  }
-  controls.update()
+    controls = new OrbitControls(camera, renderer.domElement)
+    controls.enableDamping = true
+    controls.autoRotate = false
+    controls.target.set(
+      sceneConfig.camera.target.x,
+      sceneConfig.camera.target.y,
+      sceneConfig.camera.target.z,
+    )
+    // Importante: define quais botões do mouse ativam os controles
+    // mouseButtons: LEFT = orbit, MIDDLE = zoom, RIGHT = pan
+    controls.mouseButtons = {
+      LEFT: THREE.MOUSE.ROTATE,
+      MIDDLE: THREE.MOUSE.DOLLY,
+      RIGHT: THREE.MOUSE.PAN,
+    }
+    controls.update()
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.9))
-  const light = new THREE.DirectionalLight(0xffffff, sceneConfig.lighting.mainLight.intensity)
-  light.position.set(
-    sceneConfig.lighting.mainLight.position.x,
-    sceneConfig.lighting.mainLight.position.y,
-    sceneConfig.lighting.mainLight.position.z,
-  )
-  light.castShadow = true
-  scene.add(light)
+    scene.add(new THREE.AmbientLight(0xffffff, 0.9))
+    const light = new THREE.DirectionalLight(0xffffff, sceneConfig.lighting.mainLight.intensity)
+    light.position.set(
+      sceneConfig.lighting.mainLight.position.x,
+      sceneConfig.lighting.mainLight.position.y,
+      sceneConfig.lighting.mainLight.position.z,
+    )
+    light.castShadow = true
+    scene.add(light)
 
-  const backLight = new THREE.DirectionalLight(0xffffff, sceneConfig.lighting.backLight.intensity)
-  backLight.position.set(
-    sceneConfig.lighting.backLight.position.x,
-    sceneConfig.lighting.backLight.position.y,
-    sceneConfig.lighting.backLight.position.z,
-  )
-  scene.add(backLight)
+    const backLight = new THREE.DirectionalLight(0xffffff, sceneConfig.lighting.backLight.intensity)
+    backLight.position.set(
+      sceneConfig.lighting.backLight.position.x,
+      sceneConfig.lighting.backLight.position.y,
+      sceneConfig.lighting.backLight.position.z,
+    )
+    scene.add(backLight)
 
-  createModel()
-  animate()
+    createModel()
+    animate()
 
-  // Força múltiplos resizes iniciais para garantir dimensões corretas
-  setTimeout(() => onWindowResize(), 50)
-  setTimeout(() => onWindowResize(), 150)
-  setTimeout(() => onWindowResize(), 300)
+    // Força múltiplos resizes iniciais para garantir dimensões corretas
+    setTimeout(() => onWindowResize(), 50)
+    setTimeout(() => onWindowResize(), 150)
+    setTimeout(() => onWindowResize(), 300)
 
     console.log('[SceneTemplate] initScene completo')
   } catch (error) {
@@ -874,6 +727,9 @@ async function createModel() {
       title.letterSpacing,
       title.depth,
     )
+    if (!titleMesh) {
+      continue
+    }
 
     titleMesh.position.set(
       title.positionX,
@@ -890,45 +746,23 @@ async function createModel() {
   const s = parts.base.content
   await ensureFontLoaded(s.font, 'normal')
 
-  // Detectar caracteres especiais
-  const subtitleHasSpecial = /[^a-zA-Z0-9 \-.,!?;:'"()[\]{}@#$%^&*+=<>/\\/|`~ªºñíéáóú]/.test(s.text)
-  const subtitleUseTextGeometry = s.renderType === 'textGeometry' && !subtitleHasSpecial
-
-  let subtitleMesh
-  if (subtitleUseTextGeometry) {
-    subtitleMesh = await createTextGeometryMesh(
-      s.text,
-      s.fontSize,
-      s.color,
-      s.font,
-      s.letterSpacing,
-      s.depth,
-    )
+  const subtitleMesh = await createTextGeometryMesh(
+    s.text,
+    s.fontSize,
+    s.color,
+    s.font,
+    s.letterSpacing,
+    s.depth,
+  )
+  if (subtitleMesh) {
     const subtitleHeight = subtitleMesh.userData.height || 0
     subtitleMesh.position.set(
       s.positionX,
       baseHeight / 2 - subtitleHeight / 2 + s.positionY,
       plateDepth / 2 + 0.5 + (s.positionZ || 0),
     )
-  } else {
-    subtitleMesh = createTextLabel(
-      s.text,
-      s.fontSize,
-      s.color,
-      'normal',
-      s.font,
-      s.letterSpacing,
-      s.depth,
-      s.backgroundColor || null,
-    )
-    const subtitleHeight = subtitleMesh.userData.height || 0
-    subtitleMesh.position.set(
-      s.positionX,
-      baseHeight / 2 - subtitleHeight / 2 + s.positionY,
-      plateDepth / 2 + 0.5 + (s.positionZ || 0),
-    )
+    group.add(subtitleMesh)
   }
-  group.add(subtitleMesh)
 
   // 4. LOGOS (Múltiplos)
   for (const logo of parts.logos) {
@@ -1013,8 +847,14 @@ async function createModel() {
   isCreatingModel = false
 }
 
-function animate() {
+const TARGET_FPS = 60
+const FRAME_INTERVAL = 1000 / TARGET_FPS
+let lastFrameTime = 0
+
+function animate(time) {
   animationId = requestAnimationFrame(animate)
+  if (time - lastFrameTime < FRAME_INTERVAL) return
+  lastFrameTime = time
   controls.update()
   renderer.render(scene, camera)
 }
@@ -1124,8 +964,9 @@ onBeforeUnmount(() => {
   if (resizeTimeout) {
     clearTimeout(resizeTimeout)
   }
-  if (modelUpdateTimeout) {
-    clearTimeout(modelUpdateTimeout)
+  if (modelUpdateRafId) {
+    cancelAnimationFrame(modelUpdateRafId)
+    modelUpdateRafId = null
   }
   if (resizeObserver) {
     resizeObserver.disconnect()
@@ -1160,48 +1001,15 @@ onBeforeUnmount(() => {
   }
 })
 
-// Throttle para evitar múltiplas reconstruções rápidas
-let modelUpdateTimeout = null
-let lastModelUpdate = 0
-const modelUpdateInterval = 300 // Aumentado para reduzir reconstruções
+// Atualiza em tempo real, no maximo uma vez por frame
+let modelUpdateRafId = null
 
 function throttledModelUpdate() {
-  // Se um input tem foco, não atualiza a cena 3D
-  const activeElement = document.activeElement
-  const isInputFocused =
-    activeElement &&
-    (activeElement.tagName === 'INPUT' ||
-      activeElement.tagName === 'TEXTAREA' ||
-      activeElement.tagName === 'SELECT')
-
-  if (isInputFocused) {
-    // Agenda uma nova tentativa para depois que o input perder o foco
-    if (modelUpdateTimeout) {
-      clearTimeout(modelUpdateTimeout)
-    }
-    modelUpdateTimeout = setTimeout(() => {
-      throttledModelUpdate()
-    }, 500)
-    return
-  }
-
-  const now = performance.now()
-  const elapsed = now - lastModelUpdate
-
-  if (elapsed >= modelUpdateInterval) {
-    lastModelUpdate = now
+  if (modelUpdateRafId) return
+  modelUpdateRafId = requestAnimationFrame(() => {
+    modelUpdateRafId = null
     createModel()
-    return
-  }
-
-  if (modelUpdateTimeout) {
-    clearTimeout(modelUpdateTimeout)
-  }
-
-  modelUpdateTimeout = setTimeout(() => {
-    lastModelUpdate = performance.now()
-    createModel()
-  }, modelUpdateInterval - elapsed)
+  })
 }
 
 watch(
