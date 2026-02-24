@@ -176,7 +176,8 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
       }
 
       // Calcular largura total com espaçamentos
-      const totalWidth = charData.reduce((sum, d) => sum + d.width, 0) + spacing * (charData.length - 1)
+      const totalWidth =
+        charData.reduce((sum, d) => sum + d.width, 0) + spacing * (charData.length - 1)
 
       // Calcular altura comum (maior altura entre todos)
       const maxHeight = Math.max(...charData.map((d) => d.height))
