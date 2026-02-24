@@ -123,6 +123,7 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
     // fontSize agora está em mm
     const scaledSize = fontSize
 
+    // Usar múltiplas geometrias para suportar letterSpacing adequadamente
     if (Math.abs(spacing) > 0.001) {
       const group = new THREE.Group()
       const material = new THREE.MeshStandardMaterial({
@@ -131,16 +132,10 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
         metalness: 0.1,
       })
 
-      const meshes = []
-      let maxHeight = 0
+      const charData = []
 
-      // Primeira passagem: criar geometrias e medir
       for (const ch of safeText) {
-        if (ch === '\n') {
-          continue
-        }
-
-        const charGeometry = new TextGeometry(ch, {
+        const charGeom = new TextGeometry(ch, {
           font: font,
           size: scaledSize,
           depth: depth,
@@ -153,38 +148,51 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
           lineHeight: 1.2,
         })
 
-        charGeometry.computeBoundingBox()
-        if (!charGeometry.boundingBox) {
+        charGeom.computeBoundingBox()
+        if (!charGeom.boundingBox) {
           continue
         }
 
-        const bbox = charGeometry.boundingBox
+        const bbox = charGeom.boundingBox
         const width = bbox.max.x - bbox.min.x
         const height = bbox.max.y - bbox.min.y
-        maxHeight = Math.max(maxHeight, height)
 
+        // Centralizar na X apenas, manter Y em baseline comum
         const offsetX = (bbox.max.x + bbox.min.x) / 2
-        const baselinePadding = Math.max(0.5, fontSize * 0.08)
-        const offsetY = bbox.min.y + baselinePadding
         const offsetZ = (bbox.max.z + bbox.min.z) / 2
-        charGeometry.translate(-offsetX, -offsetY, -offsetZ)
+        charGeom.translate(-offsetX, 0, -offsetZ)
 
-        const mesh = new THREE.Mesh(charGeometry, material)
-        meshes.push({ mesh, width })
+        charData.push({
+          geometry: charGeom,
+          width: width,
+          height: height,
+          minY: bbox.min.y,
+          maxY: bbox.max.y,
+        })
       }
 
-      if (meshes.length === 0) {
+      if (charData.length === 0) {
         return null
       }
 
-      // Calcular largura total incluindo espaçamentos
-      const totalWidth =
-        meshes.reduce((sum, m) => sum + m.width, 0) + spacing * Math.max(0, meshes.length - 1)
+      // Calcular largura total com espaçamentos
+      const totalWidth = charData.reduce((sum, d) => sum + d.width, 0) + spacing * (charData.length - 1)
 
-      // Segunda passagem: posicionar a partir do centro
+      // Calcular altura comum (maior altura entre todos)
+      const maxHeight = Math.max(...charData.map((d) => d.height))
+      const minYComum = Math.min(...charData.map((d) => d.minY))
+
+      // Usar a mesma baseline de padding que sem spacing
+      const baselinePadding = Math.max(0.5, fontSize * 0.08)
+      const centerYOffset = minYComum + baselinePadding
+
+      // Posicionar caracteres a partir do centro
       let cursorX = -totalWidth / 2
-      for (const { mesh, width } of meshes) {
+
+      for (const { geometry: charGeom, width } of charData) {
+        const mesh = new THREE.Mesh(charGeom, material)
         mesh.position.x = cursorX + width / 2
+        mesh.position.y = -centerYOffset
         group.add(mesh)
         cursorX += width + spacing
       }
@@ -205,7 +213,6 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
       bevelSegments: 3,
       bevelOffset: 0,
       lineHeight: 1.2,
-      letterSpacing: (spacing / Math.max(fontSize, 0.01)) * scaledSize * 0.5,
     })
 
     geometry.computeBoundingBox()
