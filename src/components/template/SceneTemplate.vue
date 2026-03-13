@@ -133,9 +133,43 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
       })
 
       const charData = []
+      const fontGlyphs = font?.data?.glyphs || {}
+      const fontResolution = font?.data?.resolution || 1000
+      const defaultAdvance = scaledSize * 0.35
+
+      const getAdvance = (glyph) => {
+        if (!glyph || typeof glyph.ha !== 'number') {
+          return defaultAdvance
+        }
+        return (glyph.ha / fontResolution) * scaledSize
+      }
 
       for (const ch of safeText) {
-        const charGeom = new TextGeometry(ch, {
+        if (ch === '\n') {
+          continue
+        }
+
+        let renderChar = ch
+        let glyph = fontGlyphs[renderChar]
+        if (!glyph) {
+          renderChar = '?'
+          glyph = fontGlyphs[renderChar]
+        }
+
+        const advance = getAdvance(glyph)
+        if (renderChar === ' ' || renderChar === '\t') {
+          charData.push({
+            geometry: null,
+            width: advance,
+            height: 0,
+            minY: 0,
+            maxY: 0,
+            hasGeometry: false,
+          })
+          continue
+        }
+
+        const charGeom = new TextGeometry(renderChar, {
           font: font,
           size: scaledSize,
           depth: depth,
@@ -150,6 +184,14 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
 
         charGeom.computeBoundingBox()
         if (!charGeom.boundingBox) {
+          charData.push({
+            geometry: null,
+            width: advance,
+            height: 0,
+            minY: 0,
+            maxY: 0,
+            hasGeometry: false,
+          })
           continue
         }
 
@@ -164,10 +206,11 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
 
         charData.push({
           geometry: charGeom,
-          width: width,
+          width: Math.max(width, advance),
           height: height,
           minY: bbox.min.y,
           maxY: bbox.max.y,
+          hasGeometry: true,
         })
       }
 
@@ -179,9 +222,14 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
       const totalWidth =
         charData.reduce((sum, d) => sum + d.width, 0) + spacing * (charData.length - 1)
 
+      const geometryChars = charData.filter((d) => d.hasGeometry)
+      if (geometryChars.length === 0) {
+        return null
+      }
+
       // Calcular altura comum (maior altura entre todos)
-      const maxHeight = Math.max(...charData.map((d) => d.height))
-      const minYComum = Math.min(...charData.map((d) => d.minY))
+      const maxHeight = Math.max(...geometryChars.map((d) => d.height))
+      const minYComum = Math.min(...geometryChars.map((d) => d.minY))
 
       // Usar a mesma baseline de padding que sem spacing
       const baselinePadding = Math.max(0.5, fontSize * 0.08)
@@ -190,11 +238,13 @@ async function createTextGeometryMesh(text, fontSize, color, fontFace, letterSpa
       // Posicionar caracteres a partir do centro
       let cursorX = -totalWidth / 2
 
-      for (const { geometry: charGeom, width } of charData) {
-        const mesh = new THREE.Mesh(charGeom, material)
-        mesh.position.x = cursorX + width / 2
-        mesh.position.y = -centerYOffset
-        group.add(mesh)
+      for (const { geometry: charGeom, width, hasGeometry } of charData) {
+        if (hasGeometry && charGeom) {
+          const mesh = new THREE.Mesh(charGeom, material)
+          mesh.position.x = cursorX + width / 2
+          mesh.position.y = -centerYOffset
+          group.add(mesh)
+        }
         cursorX += width + spacing
       }
 

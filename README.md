@@ -110,6 +110,17 @@ sudo apt install wine64 wine32
 - 🎛️ **Sliders interativos** com feedback visual
 - 🎨 **Seletores de cor** integrados
 
+### Persistência de Dados (Armazenamento Local)
+
+- 💾 **Saves Nativos**: Projetos agora usam armazenamento no sistema de arquivos do computador hospedeiro (`userData/saves`).
+- 📁 **Arquivos Isolados**: Projetos são armazenados usando serialização via Electron IPC (Inter-Process Communication).
+- 〽️ **Nenhuma dependência online**: Aplicativo funciona 100% offline, mantendo logos em string base-64 no arquivo local JSON de gravação.
+
+> **Exemplo de Interface FileSystem (Preload e Main)**
+> *   `Request (Vue)`: `window.fsApi.saveProject({ name: 'Placa Dr Joao', projectData: { ... } })`
+> *   `IpcMain (Electron)`: `fs.writeFile('~/.config/psicodecor/saves/123912.json', data)`
+> *   `Response (Vue)`: `{ id: "123912", name: "Placa Dr Joao", created_at: "2026-03-12T...", ... }`
+
 ## 🔧 Tecnologias Utilizadas
 
 - **Framework**: [Quasar Framework v2](https://quasar.dev/) + [Vue 3](https://vuejs.org/)

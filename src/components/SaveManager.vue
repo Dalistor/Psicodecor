@@ -18,6 +18,25 @@
         <div class="save-header">
           <h6 class="q-my-none">Salvos</h6>
           <div class="row q-gutter-xs items-center">
+            <!-- Barra de Armazenamento -->
+            <div
+              v-if="saves.diskSpace && saves.diskSpace.total > 0"
+              class="disk-space-container q-mr-sm"
+            >
+              <div class="disk-space-text">
+                {{ formatBytes(saves.diskSpace.free) }} / {{ formatBytes(saves.diskSpace.total) }}
+                livres
+              </div>
+              <q-linear-progress
+                :value="calcDiskPercentage()"
+                size="sm"
+                :color="getDiskColor()"
+                style="width: 80px; height: 4px; border-radius: 2px"
+              >
+                <q-tooltip>Espaço disponível em disco</q-tooltip>
+              </q-linear-progress>
+            </div>
+
             <q-linear-progress
               v-if="saves.loading"
               indeterminate
@@ -129,7 +148,7 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import { saves, formatDateDisplay } from 'src/composables/savesSupabase'
+import { saves, formatDateDisplay } from 'src/composables/savesLocal'
 import { parts } from 'src/composables/data'
 
 const isExpanded = ref(false)
@@ -140,10 +159,34 @@ const saveInput = ref(null)
 // Carrega lista de saves ao montar
 onMounted(() => {
   saves.refresh().catch((error) => {
-    console.error('Erro ao carregar saves:', error)
-    // Falha silenciosa se Supabase não estiver configurado
+    console.error('Erro ao carregar saves ou acessar disco:', error)
   })
 })
+
+// Calcula % ocupada
+function calcDiskPercentage() {
+  if (!saves.diskSpace || saves.diskSpace.total === 0) return 0
+  const used = saves.diskSpace.total - saves.diskSpace.free
+  return used / saves.diskSpace.total
+}
+
+// Cor da barra de progresso baseada no uso do disco
+function getDiskColor() {
+  const pct = calcDiskPercentage()
+  if (pct > 0.9) return 'negative'
+  if (pct > 0.7) return 'warning'
+  return 'positive'
+}
+
+// Formatar bits pra visualização de humano (GB/MB)
+function formatBytes(bytes, decimals = 2) {
+  if (!+bytes) return '0 Bytes'
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+}
 
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
@@ -285,6 +328,19 @@ async function confirmUpdateSave(saveId) {
     align-items: center;
     padding: 12px;
     border-bottom: 1px solid #555;
+  }
+
+  /* Textinho da barrinha */
+  .disk-space-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .disk-space-text {
+    font-size: 10px;
+    color: #bbb;
+    margin-bottom: 2px;
+    white-space: nowrap;
   }
 
   h6 {

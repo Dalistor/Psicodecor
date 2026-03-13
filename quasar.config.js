@@ -190,7 +190,7 @@ export default defineConfig((/* ctx */) => {
 
       extendElectronPreloadConf(cfg) {
         cfg.external = cfg.external || []
-        cfg.external = ['electron-store']
+        cfg.external.push('electron-store')
       },
 
       builder: {

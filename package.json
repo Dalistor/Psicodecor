@@ -1,6 +1,6 @@
 {
   "name": "psicodecor",
-  "version": "1.2.9",
+  "version": "1.2.14",
   "description": "Um programa de edição de uma logo padrão",
   "productName": "Psicodecor Editor",
   "author": "Dalistor <diego.sil.cabral@gmail.com>",
@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",
-    "@supabase/supabase-js": "^2.97.0",
     "electron-store": "^11.0.2",
     "idb": "^8.0.3",
     "imagetracerjs": "^1.2.6",

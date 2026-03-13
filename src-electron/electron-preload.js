@@ -27,3 +27,14 @@
  *   }
  * }
  */
+
+import { contextBridge, ipcRenderer } from 'electron'
+
+contextBridge.exposeInMainWorld('fsApi', {
+  listProjects: () => ipcRenderer.invoke('list-projects'),
+  saveProject: (data) => ipcRenderer.invoke('save-project', data),
+  loadProject: (id) => ipcRenderer.invoke('load-project', id),
+  updateProject: (data) => ipcRenderer.invoke('update-project', data),
+  deleteProject: (id) => ipcRenderer.invoke('delete-project', id),
+  getDiskSpace: () => ipcRenderer.invoke('get-disk-space'),
+})
